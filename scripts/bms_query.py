@@ -21,15 +21,30 @@ class DarenProto:
         self.addr: bytes = addr
 
     def get_system_params(self) -> str:
+        """
+        Get system parameters: voltage and current limits, barcode, etc.
+        Sample command: ~22014A47E00201FD23
+        """
         return self.command(b"\x47", self.addr)
 
     def get_protocol_version(self) -> str:
+        """
+        Get protocol version
+        """
         return self.command(b"\x4F")
 
     def get_device_info(self) -> str:
+        """
+        Get device info suitable for monitoring: charge, voltages, alarms, etc.
+        Sample command: ~22014A42E00201FD28
+        """
         return self.command(b"\x42", self.addr)
 
     def get_mfg_info(self) -> str:
+        """
+        Get manufacturer info: project code, software version, etc.
+        Sample command: ~22014A510000FDA0
+        """
         return self.command(b"\x51")
 
     def get_params(self, module: bytes) -> str:
@@ -50,9 +65,17 @@ class DarenProto:
         return self.get_params(b"\x02")
 
     def get_mfg_params(self) -> str:
+        """
+        Get manufacturer params: serial numbers, manufacturer, production date
+        Sample command: ~22014AB0600A010103FF00FB6C
+        """
         return self.get_params(b"\x03")
 
     def get_cap_params(self) -> str:
+        """
+        Get capacity info
+        Sample commands: ~22014AB0600A010104FF00FB6B
+        """
         return self.get_params(b"\x04")
 
     def command(self, cid2: bytes, info: bytes = b"") -> str:
@@ -284,8 +307,8 @@ class DarenClient:
 
     def send_cmd(self, cmd: str) -> None:
         ser = self.ser
-        ser.flushOutput()
-        ser.flushInput()
+        ser.reset_output_buffer()
+        ser.reset_input_buffer()
         _ = ser.write(cmd.encode())
         logger.debug(f"Sent command {cmd}")
 
