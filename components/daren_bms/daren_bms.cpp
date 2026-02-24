@@ -54,7 +54,7 @@ void DarenBMS::loop() {
         default:
           break;
       }
-    
+    }
     return;
   }
 
