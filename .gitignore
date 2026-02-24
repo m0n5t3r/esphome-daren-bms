@@ -1,1 +1,6 @@
 .aider*
+.*.py[co]
+typings/*
+.clangd
+pyproject.toml
+setup.cfg
