@@ -1,0 +1,75 @@
+#pragma once
+
+#include "esphome/core/component.h"
+#include "esphome/components/uart/uart.h"
+#include <cstdint>
+#include <vector>
+#include <string>
+
+namespace esphome {
+namespace daren_bms {
+
+class DarenBMS : public Component, public uart::UARTDevice {
+ public:
+  void setup() override;
+  void dump_config() override;
+  void loop() override;
+
+  void set_bms_id(uint8_t bms_id) { this->bms_id_ = bms_id; }
+
+ protected:
+  static const uint8_t VER_ = 0x22;
+  static const uint8_t CID1_ = 0x4A;
+  static const uint8_t CMD_SYSTEM_PARAMS_ = 0x47;
+  static const uint8_t CMD_PROTOCOL_VERSION_ = 0x4F;
+  static const uint8_t CMD_MFG_INFO_ = 0x51;
+  static const uint8_t CMD_DEVICE_INFO_ = 0x42;
+  static const uint8_t CMD_PARAMS_ = 0xB0;
+  static const uint8_t CMD_PARAMS_MOD_OCV_ = 0x01;
+  static const uint8_t CMD_PARAMS_MOD_HWPROT_ = 0x02;
+  static const uint8_t CMD_PARAMS_MOD_MFG_ = 0x03;
+  static const uint8_t CMD_PARAMS_MOD_CAP_ = 0x04;
+  uint8_t bms_id_{0x01};  // Default BMS ID
+
+  // Command building
+  std::string build_command_(uint8_t cid2, const uint8_t *data = nullptr, size_t len = 0);
+
+  // Response parsing
+  bool parse_response_(const std::vector<uint8_t> &response, std::vector<uint8_t> &payload);
+
+  // read response
+  std::vector<uint8_t> read_response();
+
+  // Setup phase queries
+  void query_manufacturer_info_();
+  void query_manufacturer_params_();
+  void query_capacity_params_();
+  void query_system_params_();
+
+  // Update phase queries
+  void query_device_info_();
+
+  // Helper methods
+  uint16_t length_checksum_(uint16_t value);
+  uint16_t checksum_(const std::string &s);
+  void append_hex_(std::string &str, uint8_t value);
+  void append_hex_(std::string &str, uint16_t value);
+
+  // State tracking
+  enum SetupState {
+    SETUP_MFG_INFO,
+    SETUP_MFG_PARAMS,
+    SETUP_CAP_PARAMS,
+    SETUP_SYSTEM_PARAMS,
+    SETUP_COMPLETE
+  } setup_state_{SETUP_MFG_INFO};
+
+  // Data storage
+  std::string manufacturer_info_;
+  std::string manufacturer_params_;
+  std::string capacity_params_;
+  std::string system_params_;
+};
+
+}  // namespace daren_bms
+}  // namespace esphome
