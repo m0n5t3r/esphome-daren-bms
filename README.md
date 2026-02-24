@@ -1,19 +1,110 @@
-# esphome-jk-bms
+# esphome-daren-bms
 
 ![GitHub actions](https://github.com/m0n5t3r/esphome-dr-bms/actions/workflows/ci.yaml/badge.svg)
 
 ESPHome component to monitor a Daren Battery Management System (DR-BMS) via UART-TTL
 
 ## Supported devices
-Work in progress, but this intends to cover the devices showing up as DR-JC03 and similar. Mine displays DR48100JC-03-V2, but the info gotten via RS485 says NIE-JC48100.
+
+This component supports Daren/DR-BMS devices showing up as DR-JC03 and similar. My device displays DR48100JC-03-V2, but the info gotten via RS485 says NIE-JC48100.
+
+An example protocol implementation in Python is `scripts/bms_query.py`
 
 ## Requirements
 
 * [ESPHome 2024.6.0 or higher](https://github.com/esphome/esphome/releases).
 * Generic ESP32 or ESP8266 board
+* UART connection (RS485 adapter recommended for longer distances)
+
+## Installation
+
+1. Copy the `daren_bms` directory to your ESPHome `components` directory
+2. Or add as an external component in your ESPHome configuration
+
+## Configuration
+
+### Basic Configuration
+
+```yaml
+uart:
+  rx_pin: GPIO16
+  tx_pin: GPIO17
+  baud_rate: 9600
+
+daren_bms:
+```
+
+### Full Configuration
+
+```yaml
+uart:
+  rx_pin: GPIO16
+  tx_pin: GPIO17
+  baud_rate: 9600
+
+daren_bms:
+  bms_id: 0x01
+  update_interval: 60s
+  max_cell_count: 16
+  soc:
+    name: "Battery State of Charge"
+  voltage:
+    name: "Battery Voltage"
+  current:
+    name: "Battery Current"
+  temperature:
+    name: "Battery Temperature"
+  capacity_remaining:
+    name: "Remaining Capacity"
+  capacity_full:
+    name: "Full Capacity"
+  capacity_design:
+    name: "Design Capacity"
+  cycle_count:
+    name: "Cycle Count"
+  soh:
+    name: "State of Health"
+  internal_resistance:
+    name: "Internal Resistance"
+  fet_status:
+    name: "FET Status"
+  balance_state:
+    name: "Balance State"
+```
+
+## Available Sensors
+
+### Basic Sensors
+- `soc` - State of Charge (%)
+- `voltage` - Battery voltage (V)
+- `current` - Battery current (A)
+- `temperature` - Pack temperature (°C)
+- `capacity_remaining` - Remaining capacity (Ah)
+- `capacity_full` - Full capacity (Ah)
+- `capacity_design` - Design capacity (Ah)
+- `cycle_count` - Cycle count
+- `soh` - State of Health (%)
+- `internal_resistance` - Internal resistance (mΩ)
+- `fet_status` - FET status
+- `balance_state` - Balance state
+
+### Cell Voltages
+Individual cell voltage sensors are automatically created based on `max_cell_count` setting:
+- `cell_1_voltage`, `cell_2_voltage`, ..., `cell_16_voltage`
+
+## Protocol Details
+
+This component uses the Daren/DR-BMS RS485 protocol specification:
+- Baud rate: 9600
+- Data format: 8N1
+- Protocol: Custom Daren command/response protocol
 
 ## References
 
 * https://github.com/syssi/esphome-jk-bms - heavy inspiration for the esphome bits
 * https://github.com/cpttinkering/daren-485 - protocol details
 * https://github.com/butterwecksolutions/DR-JC03-RS485-Switcher - first thing that worked, used for double checking my commands
+
+## License
+
+GNU General Public License v3.0
