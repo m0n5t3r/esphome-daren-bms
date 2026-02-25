@@ -3,13 +3,16 @@
 #include <cstdio>
 #include <vector>
 
+#ifndef TESTING
 #include "esphome/core/log.h"
+#endif // !TESTING
 
 namespace esphome {
 namespace daren_bms {
 
 static const char *const TAG = "daren_bms";
 
+#ifndef TESTING
 void DarenBMS::setup() {
   ESP_LOGD(TAG, "Setting up Daren BMS...");
 
@@ -69,6 +72,7 @@ void DarenBMS::loop() {
     this->query_device_info_();
   }
 }
+#endif // !TESTING
 
 void DarenBMS::append_hex_(std::string &str, uint8_t value) {
   char hex[3];
@@ -85,6 +89,20 @@ void DarenBMS::append_hex_(std::string &str, uint16_t value) {
   str += hex[2];
   str += hex[3];
 }
+
+#ifdef TESTING
+std::string DarenBMS::gen_cmd(const uint8_t cmd_id, const uint8_t module_id) {
+  switch(cmd_id) {
+    case CMD_PARAMS_:
+      return this->build_command_(cmd_id, {this->bms_id_, 0x01, module_id, 0xff, 0x00});
+    case CMD_MFG_INFO_:
+    case CMD_PROTOCOL_VERSION_:
+      return this->build_command_(cmd_id);
+    default:
+      return this->build_command_(cmd_id, {this->bms_id_});
+  }
+}
+#endif // TESTING
 
 std::string DarenBMS::build_command_(uint8_t cid2, const std::vector<uint8_t> info) {
   std::string cmd;
@@ -140,6 +158,7 @@ uint16_t DarenBMS::checksum_(const std::string &s) {
 
 std::vector<uint8_t> DarenBMS::read_response() {
   std::vector<uint8_t> response = {};
+#ifndef TESTING
   if (this->available() >= 1) {
     uint8_t data;
     while (this->read_byte(&data)) {
@@ -149,6 +168,7 @@ std::vector<uint8_t> DarenBMS::read_response() {
       }
     }
   }
+#endif // !TESTING
   return response;
 }
 
@@ -194,34 +214,44 @@ bool DarenBMS::parse_response_(const std::vector<uint8_t> &response, std::vector
 
 void DarenBMS::query_manufacturer_info_() {
   std::string cmd = this->build_command_(0x47);
+#ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying manufacturer info: %s", cmd.c_str());
+#endif // !TESTING
 }
 
 void DarenBMS::query_manufacturer_params_() {
   std::vector<uint8_t> data = {0x60, 0x0A, 0x01, 0x01, 0x03, 0xFF, 0x00};
   std::string cmd = this->build_command_(0xB0, data);
+#ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying manufacturer params: %s", cmd.c_str());
+#endif // !TESTING
 }
 
 void DarenBMS::query_capacity_params_() {
   std::vector<uint8_t> data = {0x60, 0x0A, 0x01, 0x01, 0x04, 0xFF, 0x00};
   std::string cmd = this->build_command_(0xB0, data);
+#ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying capacity params: %s", cmd.c_str());
+#endif // !TESTING
 }
 
 void DarenBMS::query_system_params_() {
   std::string cmd = this->build_command_(0x42);
+#ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying system params: %s", cmd.c_str());
+#endif // !TESTING
 }
 
 void DarenBMS::query_device_info_() {
   std::string cmd = this->build_command_(0x42);
+#ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying device info: %s", cmd.c_str());
+#endif // !TESTING
 }
 
 }  // namespace daren_bms

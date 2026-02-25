@@ -1,7 +1,9 @@
 #pragma once
 
+#ifndef TESTING
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
+#endif // !TESTING
 #include <cstdint>
 #include <vector>
 #include <string>
@@ -10,7 +12,11 @@
 namespace esphome {
 namespace daren_bms {
 
+#ifndef TESTING
 class DarenBMS : public Component, public uart::UARTDevice {
+#else // TESTING
+class DarenBMS {
+#endif // !TESTING
  public:
   static const uint8_t CMD_SYSTEM_PARAMS_ = 0x47;
   static const uint8_t CMD_PROTOCOL_VERSION_ = 0x4F;
@@ -21,12 +27,20 @@ class DarenBMS : public Component, public uart::UARTDevice {
   static const uint8_t CMD_PARAMS_MOD_HWPROT_ = 0x02;
   static const uint8_t CMD_PARAMS_MOD_MFG_ = 0x03;
   static const uint8_t CMD_PARAMS_MOD_CAP_ = 0x04;
+#ifndef TESTING
   void setup() override;
   void dump_config() override;
   void loop() override;
+#else // TESTING
+	DarenBMS() = default;
+#endif // !TESTING
 
   void set_bms_id(uint8_t bms_id) { this->bms_id_ = bms_id; }
   uint8_t get_bms_id() { return this->bms_id_; }
+
+#ifdef TESTING
+  std::string gen_cmd(const uint8_t cmd_id, const uint8_t module_id = 0);
+#endif // TESTING
 
  protected:
   static const uint8_t VER_ = 0x22;
