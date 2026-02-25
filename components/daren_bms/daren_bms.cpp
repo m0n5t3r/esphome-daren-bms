@@ -1,8 +1,9 @@
 #include "daren_bms.h"
-#include "esphome/core/log.h"
-#include "esphome/core/helpers.h"
 #include <cstdint>
+#include <cstdio>
 #include <vector>
+
+#include "esphome/core/log.h"
 
 namespace esphome {
 namespace daren_bms {
@@ -36,14 +37,17 @@ void DarenBMS::loop() {
       switch (this->setup_state_) {
         case SETUP_MFG_INFO:
           this->manufacturer_info_ = std::string(payload.begin(), payload.end());
+          ESP_LOGD(TAG, "Querying manufacturer params");
           this->query_manufacturer_params_();
           break;
         case SETUP_MFG_PARAMS:
           this->manufacturer_params_ = std::string(payload.begin(), payload.end());
+          ESP_LOGD(TAG, "Querying capacity params");
           this->query_capacity_params_();
           break;
         case SETUP_CAP_PARAMS:
           this->capacity_params_ = std::string(payload.begin(), payload.end());
+          ESP_LOGD(TAG, "Querying system params");
           this->query_system_params_();
           break;
         case SETUP_SYSTEM_PARAMS:
@@ -68,25 +72,26 @@ void DarenBMS::loop() {
 
 void DarenBMS::append_hex_(std::string &str, uint8_t value) {
   char hex[3];
-  format_hex_to(hex, value);
+  sprintf(hex, "%02X", value);
   str += hex[0];
   str += hex[1];
 }
 
 void DarenBMS::append_hex_(std::string &str, uint16_t value) {
   char hex[5];
-  format_hex_to(hex, value);
+  sprintf(hex, "%02X", value);
   str += hex[0];
   str += hex[1];
   str += hex[2];
   str += hex[3];
 }
 
-std::string DarenBMS::build_command_(uint8_t cid2, const uint8_t *data, size_t len) {
+std::string DarenBMS::build_command_(uint8_t cid2, const std::vector<uint8_t> info) {
   std::string cmd;
+  size_t len = info.size();
 
   cmd += '~';
-  this->append_hex_(cmd, VER_);
+  this->append_hex_(cmd, VER_); 
   this->append_hex_(cmd, this->bms_id_);
   this->append_hex_(cmd, CID1_);
   this->append_hex_(cmd, cid2);
@@ -98,7 +103,7 @@ std::string DarenBMS::build_command_(uint8_t cid2, const uint8_t *data, size_t l
 
     // Data
     for (size_t i = 0; i < len; i++) {
-      this->append_hex_(cmd, data[i]);
+      this->append_hex_(cmd, info[i]);
     }
   } else {
     cmd += "0000";
@@ -125,13 +130,8 @@ uint16_t DarenBMS::length_checksum_(uint16_t value) {
 }
 
 uint16_t DarenBMS::checksum_(const std::string &s) {
-  std::string upper_s = s;
-  // Convert to uppercase
-  for (char &c : upper_s) {
-    c = toupper(c);
-  }
   uint16_t cksum = 0;
-  for (char c : upper_s) {
+  for (char c : s) {
     cksum += static_cast<uint8_t>(c);
   }
   cksum ^= 0xFFFF;
@@ -194,33 +194,33 @@ bool DarenBMS::parse_response_(const std::vector<uint8_t> &response, std::vector
 
 void DarenBMS::query_manufacturer_info_() {
   std::string cmd = this->build_command_(0x47);
-  this->write_str(cmd);
+  this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying manufacturer info: %s", cmd.c_str());
 }
 
 void DarenBMS::query_manufacturer_params_() {
-  uint8_t data[] = {0x60, 0x0A, 0x01, 0x01, 0x03, 0xFF, 0x00};
-  std::string cmd = this->build_command_(0xB0, data, sizeof(data));
-  this->write_str(cmd);
+  std::vector<uint8_t> data = {0x60, 0x0A, 0x01, 0x01, 0x03, 0xFF, 0x00};
+  std::string cmd = this->build_command_(0xB0, data);
+  this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying manufacturer params: %s", cmd.c_str());
 }
 
 void DarenBMS::query_capacity_params_() {
-  uint8_t data[] = {0x60, 0x0A, 0x01, 0x01, 0x04, 0xFF, 0x00};
-  std::string cmd = this->build_command_(0xB0, data, sizeof(data));
-  this->write_str(cmd);
+  std::vector<uint8_t> data = {0x60, 0x0A, 0x01, 0x01, 0x04, 0xFF, 0x00};
+  std::string cmd = this->build_command_(0xB0, data);
+  this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying capacity params: %s", cmd.c_str());
 }
 
 void DarenBMS::query_system_params_() {
   std::string cmd = this->build_command_(0x42);
-  this->write_str(cmd);
+  this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying system params: %s", cmd.c_str());
 }
 
 void DarenBMS::query_device_info_() {
   std::string cmd = this->build_command_(0x42);
-  this->write_str(cmd);
+  this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying device info: %s", cmd.c_str());
 }
 

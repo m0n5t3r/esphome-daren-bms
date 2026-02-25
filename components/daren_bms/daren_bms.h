@@ -5,21 +5,13 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <cstring>
 
 namespace esphome {
 namespace daren_bms {
 
 class DarenBMS : public Component, public uart::UARTDevice {
  public:
-  void setup() override;
-  void dump_config() override;
-  void loop() override;
-
-  void set_bms_id(uint8_t bms_id) { this->bms_id_ = bms_id; }
-
- protected:
-  static const uint8_t VER_ = 0x22;
-  static const uint8_t CID1_ = 0x4A;
   static const uint8_t CMD_SYSTEM_PARAMS_ = 0x47;
   static const uint8_t CMD_PROTOCOL_VERSION_ = 0x4F;
   static const uint8_t CMD_MFG_INFO_ = 0x51;
@@ -29,10 +21,20 @@ class DarenBMS : public Component, public uart::UARTDevice {
   static const uint8_t CMD_PARAMS_MOD_HWPROT_ = 0x02;
   static const uint8_t CMD_PARAMS_MOD_MFG_ = 0x03;
   static const uint8_t CMD_PARAMS_MOD_CAP_ = 0x04;
-  uint8_t bms_id_{0x01};  // Default BMS ID
+  void setup() override;
+  void dump_config() override;
+  void loop() override;
+
+  void set_bms_id(uint8_t bms_id) { this->bms_id_ = bms_id; }
+  uint8_t get_bms_id() { return this->bms_id_; }
+
+ protected:
+  static const uint8_t VER_ = 0x22;
+  static const uint8_t CID1_ = 0x4A;
+  uint8_t bms_id_ = 0x01;  // Default BMS ID
 
   // Command building
-  std::string build_command_(uint8_t cid2, const uint8_t *data = nullptr, size_t len = 0);
+  std::string build_command_(uint8_t cid2, const std::vector<uint8_t> info = {});
 
   // Response parsing
   bool parse_response_(const std::vector<uint8_t> &response, std::vector<uint8_t> &payload);
