@@ -43,7 +43,6 @@ namespace esphome {
     // Helper methods
     uint16_t length_checksum(uint16_t value);
     uint16_t checksum(const std::string &s);
-    uint16_t checksum(const std::vector<uint8_t> &vec);
     void append_hex(std::string &str, uint8_t value);
     void append_hex(std::string &str, uint16_t value);
 
