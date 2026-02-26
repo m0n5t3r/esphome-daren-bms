@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <vector>
+#include <iostream>
 
 #ifndef TESTING
 #include "esphome/core/log.h"
@@ -139,6 +140,17 @@ std::string DarenBMS::gen_cmd(const uint8_t cmd_id, const uint8_t module_id) {
       return this->build_command_(cmd_id, {this->bms_id_});
   }
 }
+
+  void DarenBMS::setup() {
+    std::vector<uint8_t> payload;
+    bool is_okay = this->parse_response_(this->read_response_(), payload);
+
+    if(is_okay) {
+      std::cout << "Payload is " << this->format_hex(payload) << std::endl;
+    } else {
+      std::cout << "Payload parsing failed" << std::endl;
+    }
+  }
 #endif // TESTING
 
 std::string DarenBMS::build_command_(uint8_t cid2, const std::vector<uint8_t> info) {

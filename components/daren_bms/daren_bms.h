@@ -34,6 +34,20 @@ class DarenBMS {
   void loop() override;
 #else // TESTING
 	DarenBMS() = default;
+  void setup();
+  char* format_hex(std::vector<uint8_t> data) {
+    char* hexString = new char[data.size() * 2 + 1];
+
+    for (size_t i = 0; i < data.size(); ++i) {
+      // Convert each byte to its hexadecimal representation
+      sprintf(hexString + (i * 2), "%02X", data[i]);
+    }
+
+    // Null-terminate the string
+    hexString[data.size() * 2] = '\0';
+    return hexString;
+  }
+
 #endif // !TESTING
 
   void set_bms_id(uint8_t bms_id) { this->bms_id_ = bms_id; }
