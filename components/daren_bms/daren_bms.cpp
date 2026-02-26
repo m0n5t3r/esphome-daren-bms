@@ -283,7 +283,7 @@ bool DarenBMS::parse_response_(const std::string &buf, std::vector<uint8_t> &pay
 }
 
 void DarenBMS::query_manufacturer_info_() {
-  std::string cmd = this->build_command_(0x47);
+  std::string cmd = this->build_command_(this->CMD_MFG_INFO_);
 #ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying manufacturer info: %s", cmd.c_str());
@@ -291,7 +291,7 @@ void DarenBMS::query_manufacturer_info_() {
 }
 
 void DarenBMS::query_manufacturer_params_() {
-  std::vector<uint8_t> data = {0x60, 0x0A, 0x01, 0x01, 0x03, 0xFF, 0x00};
+  std::vector<uint8_t> data = {this->bms_id_, 0x01, this->CMD_PARAMS_MOD_MFG_, 0xff, 0x00};
   std::string cmd = this->build_command_(0xB0, data);
 #ifndef TESTING
   this->write_str(cmd.c_str());
@@ -300,8 +300,8 @@ void DarenBMS::query_manufacturer_params_() {
 }
 
 void DarenBMS::query_capacity_params_() {
-  std::vector<uint8_t> data = {0x60, 0x0A, 0x01, 0x01, 0x04, 0xFF, 0x00};
-  std::string cmd = this->build_command_(0xB0, data);
+  std::vector<uint8_t> data = {this->bms_id_, 0x01, this->CMD_PARAMS_MOD_CAP_, 0xff, 0x00};
+  std::string cmd = this->build_command_(this->CMD_PARAMS_, data);
 #ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying capacity params: %s", cmd.c_str());
@@ -309,7 +309,7 @@ void DarenBMS::query_capacity_params_() {
 }
 
 void DarenBMS::query_system_params_() {
-  std::string cmd = this->build_command_(0x42);
+  std::string cmd = this->build_command_(this->CMD_SYSTEM_PARAMS_);
 #ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying system params: %s", cmd.c_str());
@@ -317,7 +317,7 @@ void DarenBMS::query_system_params_() {
 }
 
 void DarenBMS::query_device_info_() {
-  std::string cmd = this->build_command_(0x42);
+  std::string cmd = this->build_command_(this->CMD_DEVICE_INFO_);
 #ifndef TESTING
   this->write_str(cmd.c_str());
   ESP_LOGD(TAG, "Querying device info: %s", cmd.c_str());
