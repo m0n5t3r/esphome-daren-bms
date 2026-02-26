@@ -4,6 +4,7 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #endif // !TESTING
+#include <unordered_map>
 #include <cstdint>
 #include <vector>
 #include <string>
@@ -45,16 +46,17 @@ class DarenBMS {
  protected:
   static const uint8_t VER_ = 0x22;
   static const uint8_t CID1_ = 0x4A;
+  static const std::unordered_map<uint8_t, std::string> CID2_CODES_;
   uint8_t bms_id_ = 0x01;  // Default BMS ID
 
   // Command building
   std::string build_command_(uint8_t cid2, const std::vector<uint8_t> info = {});
 
   // Response parsing
-  bool parse_response_(const std::vector<uint8_t> &response, std::vector<uint8_t> &payload);
+  bool parse_response_(const std::string &response, std::vector<uint8_t> &payload);
 
   // read response
-  std::vector<uint8_t> read_response();
+  std::string read_response();
 
   // Setup phase queries
   void query_manufacturer_info_();
@@ -68,8 +70,10 @@ class DarenBMS {
   // Helper methods
   uint16_t length_checksum_(uint16_t value);
   uint16_t checksum_(const std::string &s);
+  uint16_t checksum_(const std::vector<uint8_t> &vec);
   void append_hex_(std::string &str, uint8_t value);
   void append_hex_(std::string &str, uint16_t value);
+  std::vector<uint8_t> parse_hex(std::string str);
 
   // State tracking
   enum SetupState {

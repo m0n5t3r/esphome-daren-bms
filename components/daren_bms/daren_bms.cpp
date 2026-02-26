@@ -12,6 +12,18 @@ namespace daren_bms {
 
 static const char *const TAG = "daren_bms";
 
+const std::unordered_map<uint8_t, std::string> DarenBMS::CID2_CODES_ = {
+  {0x00, "CID2 response ok."},
+  {0x01, "VER error."},
+  {0x02, "CHKSUM error."},
+  {0x03, "LCHKSUM error."},
+  {0x04, "CID2 invalid."},
+  {0x05, "Command format error."},
+  {0x06, "INFO data invalid."},
+  {0x90, "ADR error."},
+  {0x91, "Battery communication error."},
+};
+
 #ifndef TESTING
 void DarenBMS::setup() {
   ESP_LOGD(TAG, "Setting up Daren BMS...");
@@ -90,6 +102,31 @@ void DarenBMS::append_hex_(std::string &str, uint16_t value) {
   str += hex[3];
 }
 
+std::vector<uint8_t> DarenBMS::parse_hex(std::string str) {
+  std::vector<uint8_t> parsed = {};
+  uint buf;
+  size_t start = 0;
+  size_t end = str.length();
+  if(str.length() % 2 != 0) {
+    return parsed;
+  }
+  if(str[0] == '~') {
+    parsed.push_back('~');
+    start = 1;
+  }
+  if(str[end - 1] == '\r') {
+    end -= 1;
+  }
+  for (size_t i = start; i < end; i += 2) {
+      sscanf(str.substr(i, 2).c_str(), "%02X", &buf);
+      parsed.push_back(buf);
+  }
+  if(end != str.length()) {
+    parsed.push_back('\r');
+  }
+  return parsed;
+}
+
 #ifdef TESTING
 std::string DarenBMS::gen_cmd(const uint8_t cmd_id, const uint8_t module_id) {
   switch(cmd_id) {
@@ -156,23 +193,27 @@ uint16_t DarenBMS::checksum_(const std::string &s) {
   return cksum + 1;
 }
 
-std::vector<uint8_t> DarenBMS::read_response() {
-  std::vector<uint8_t> response = {};
+std::string DarenBMS::read_response() {
+  std::string buf;
 #ifndef TESTING
   if (this->available() >= 1) {
     uint8_t data;
     while (this->read_byte(&data)) {
-      response.push_back(data);
+      buf += data;
       if (data == '\r') {
         break;
       }
     }
   }
+#else
+  buf = "~22014A00E0C60026F914DF100D0D0D0B0D0B0D0C0D0D0D0C0D0C0D0C0D0B0D0B0D0B0D0B0D0C0D0C0D0C0D0C009E007E008804007F0082007A007D000000000064012834281C0001000000000000000010230000000000000000000000000000000000000000004000D4A8\r";
 #endif // !TESTING
-  return response;
+  return buf;
 }
 
-bool DarenBMS::parse_response_(const std::vector<uint8_t> &response, std::vector<uint8_t> &payload) {
+bool DarenBMS::parse_response_(const std::string &buf, std::vector<uint8_t> &payload) {
+  std::vector<uint8_t>response = this->parse_hex(buf);
+
   if (response.size() < 6) {
     return false;  // Minimum response size
   }
@@ -182,28 +223,45 @@ bool DarenBMS::parse_response_(const std::vector<uint8_t> &response, std::vector
     return false;
   }
 
+  // Check version
+  if (response[1] != this->VER_) {
+    return false;
+  }
+
   // Check address
-  if (response[1] != this->bms_id_) {
+  if (response[2] != this->bms_id_) {
     return false;
   }
 
   // Check response CID1 (should be 0xA5 for responses)
-  if (response[2] != 0xA5) {
+  if (response[3] != this->CID1_) {
+    return false;
+  }
+
+  // check CID2
+  if (response[4] != 0x00) {
+#ifndef TESTING
+  ESP_LOGD(TAG, "CID2 error: %s", CID2_CODES_[response[4]].c_str());
+#endif // !TESTING
     return false;
   }
 
   // Extract payload length
-  uint8_t length = response[4];
+  uint16_t len_id = response[4] <<8 | response[5];
+  uint16_t length = (len_id & 0x0fff) / 2;
   if (response.size() < 6 + length) {
+#ifndef TESTING
+  ESP_LOGD(TAG, "Length error: found %d, should be > %d", response.size(), length);
+#endif // !TESTING
     return false;
   }
 
-  // Verify checksum
-  uint8_t checksum = 0;
-  for (size_t i = 1; i < response.size() - 1; i++) {
-    checksum ^= response[i];
-  }
-  if (checksum != response.back()) {
+  uint16_t buf_checksum = response[response.size() - 3] << 8 | response[response.size() - 2];
+  uint16_t calc_checksum = this->checksum_(buf.substr(1, buf.length() - 6));
+  if(buf_checksum != calc_checksum) {
+#ifndef TESTING
+    ESP_LOGD(TAG, "Checksum error: received %04x, calculated %04x", buf_checksum, calc_checksum);
+#endif // !TESTING
     return false;
   }
 
