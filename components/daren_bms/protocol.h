@@ -38,7 +38,7 @@ namespace esphome {
     std::string build_command(uint8_t bms_id, uint8_t cid2, const std::vector<uint8_t> info);
     std::string build_command(uint8_t bms_id, uint8_t cid2, const uint8_t module_id=0);
     // validate response and extract payload
-    bool validate_response(uint8_t bms_id, std::string buf, std::vector<uint8_t> payload);
+    bool validate_response(uint8_t bms_id, std::string buf, std::vector<uint8_t> &payload);
 
     // Helper methods
     uint16_t length_checksum(uint16_t value);
@@ -46,6 +46,15 @@ namespace esphome {
     void append_hex(std::string &str, uint8_t value);
     void append_hex(std::string &str, uint16_t value);
 
+    std::unordered_map<std::string, std::string> unpack_mfg_info(std::vector<uint8_t> payload);
+    std::unordered_map<std::string, std::string> unpack_device_info(std::vector<uint8_t> payload);
+    std::unordered_map<std::string, std::string> unpack_system_params(std::vector<uint8_t> payload);
+    std::unordered_map<std::string, std::string> unpack_mfg_params(std::vector<uint8_t> payload);
+    std::unordered_map<std::string, std::string> unpack_cap_params(std::vector<uint8_t> payload);
+
+#ifdef TESTING
+    char* format_hex(std::vector<uint8_t> data);
+#endif
   }
 }
 #endif // DR_PROTOCOL_H

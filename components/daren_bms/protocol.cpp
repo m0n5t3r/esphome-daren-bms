@@ -1,5 +1,9 @@
 #include "protocol.h"
 #include <cstdint>
+#include <cstdio>
+#include <format>
+#include <unordered_map>
+#include <string>
 #include <vector>
 #include <iostream>
 
@@ -50,8 +54,7 @@ namespace esphome {
       return parsed;
     }
 
-
-    bool validate_response(uint8_t bms_id, std::string &buf, std::vector<uint8_t> payload) {
+    bool validate_response(uint8_t bms_id, std::string buf, std::vector<uint8_t> &payload) {
       std::vector<uint8_t>response = parse_hex(buf);
 
       if (response.size() < 6) {
@@ -115,7 +118,7 @@ namespace esphome {
       size_t len = info.size();
 
       cmd += '~';
-      append_hex(cmd, VER); 
+      append_hex(cmd, VER);
       append_hex(cmd, bms_id);
       append_hex(cmd, CID1);
       append_hex(cmd, cid2);
@@ -172,6 +175,108 @@ namespace esphome {
       }
       cksum ^= 0xFFFF;
       return cksum + 1;
+    }
+
+    std::unordered_map<std::string, std::string> unpack_mfg_info(std::vector<uint8_t> payload) {
+      std::unordered_map<std::string, std::string> result;
+      result["hwtype"] = std::string(payload.begin(), payload.begin() + 10);
+      result["product_code"] = std::string(payload.begin() + 10, payload.begin() + 20);
+      result["project_code"] = std::string(payload.begin() + 20, payload.begin() + 30);
+      result["software_version"] = std::format("{:02d}.{:02d}.{:02d}", payload[30], payload[31], payload[32]);
+      return result;
+    }
+
+    std::unordered_map<std::string, std::string> unpack_device_info(std::vector<uint8_t> payload) {
+      std::unordered_map<std::string, std::string> result;
+      uint8_t cell_count = payload[5];
+      result["soc"] = std::format("{:.2f}", static_cast<float>(payload[1] << 8 | payload[2]) / 100.0f);
+      result["voltage"] = std::format("{:.2f}", static_cast<float>(payload[3] << 8 | payload[4]) / 100.0f);
+      result["cell_count"] = std::to_string(cell_count);
+
+      size_t off = 6;
+      for (uint8_t cell_no = 0; cell_no < cell_count; cell_no++) {
+        result[std::format("cell_{}_voltage", cell_no + 1)] = std::format("{:.3f}", static_cast<float>(payload[off] << 8 | payload[off + 1]) / 1000.0f);
+        off += 2;
+      }
+
+      uint8_t tot_temps = payload[off + 6];
+      result["env_temp"] = std::format("{:.1f}", static_cast<float>(static_cast<int16_t>(payload[off] << 8 | payload[off + 1])) / 10.0f);
+      result["pack_temp"] = std::format("{:.1f}", static_cast<float>(static_cast<int16_t>(payload[off + 2] << 8 | payload[off + 3])) / 10.0f);
+      result["mos_temp"] = std::format("{:.1f}", static_cast<float>(static_cast<int16_t>(payload[off + 4] << 8 | payload[off + 5])) / 10.0f);
+      result["tot_temps"] = std::to_string(tot_temps);
+
+      off += 7;
+      for (uint8_t temp_no = 0; temp_no < tot_temps; temp_no++) {
+        result[std::format("temp_{}", temp_no + 1)] = std::format("{:.1f}", static_cast<float>(static_cast<int16_t>(payload[off] << 8 | payload[off + 1])) / 10.0f);
+        off += 2;
+      }
+
+      result["current"] = std::format("{:.2f}", static_cast<float>(static_cast<int16_t>(payload[off] << 8 | payload[off + 1])) / 100.0f);
+      result["internal_r"] = std::format("{:.1f}", static_cast<float>(payload[off + 2] << 8 | payload[off + 3]) / 10.0f);
+      result["soh"] = std::to_string(payload[off + 4] << 8 | payload[off + 5]);
+      result["user_custom"] = std::to_string(payload[off + 6]);
+      result["charge_full_ah"] = std::format("{:.2f}", static_cast<float>(payload[off + 7] << 8 | payload[off + 8]) / 100.0f);
+      result["charge_now_ah"] = std::format("{:.2f}", static_cast<float>(payload[off + 9] << 8 | payload[off + 10]) / 100.0f);
+      result["cycle_count"] = std::to_string(payload[off + 11] << 8 | payload[off + 12]);
+      result["voltage_status"] = std::to_string(payload[off + 13] << 8 | payload[off + 14]);
+      result["current_status"] = std::to_string(payload[off + 15] << 8 | payload[off + 16]);
+      result["temp_status"] = std::to_string(payload[off + 17] << 8 | payload[off + 18]);
+      result["fet_status"] = std::to_string(payload[off + 19] << 8 | payload[off + 20]);
+      result["overvolt_prot_status_l"] = std::to_string(payload[off + 21] << 8 | payload[off + 22]);
+      result["undervolt_prot_status_l"] = std::to_string(payload[off + 23] << 8 | payload[off + 24]);
+      result["overvolt_alarm_status_l"] = std::to_string(payload[off + 25] << 8 | payload[off + 26]);
+      result["undervolt_alarm_status_l"] = std::to_string(payload[off + 27] << 8 | payload[off + 28]);
+      result["balance_state_l"] = std::to_string(payload[off + 29] << 8 | payload[off + 30]);
+      result["balance_state_h"] = std::to_string(payload[off + 31] << 8 | payload[off + 32]);
+      result["overvolt_prot_status_h"] = std::to_string(payload[off + 33] << 8 | payload[off + 34]);
+      result["undervolt_prot_status_h"] = std::to_string(payload[off + 35] << 8 | payload[off + 36]);
+      result["overvolt_alarm_status_h"] = std::to_string(payload[off + 37] << 8 | payload[off + 38]);
+      result["undervolt_alarm_status_h"] = std::to_string(payload[off + 39] << 8 | payload[off + 40]);
+      result["machine_status_list"] = std::to_string(payload[off + 41]);
+      result["io_status_list"] = std::format("{:04x}", payload[off + 42] << 8 | payload[off + 43]);
+
+      return result;
+    }
+
+    std::unordered_map<std::string, std::string> unpack_system_params(std::vector<uint8_t> payload) {
+      std::unordered_map<std::string, std::string> result;
+      result["cell_v_upper_limit"] = std::format("{:.3f}", static_cast<float>(payload[1] << 8 | payload[2]) / 1000.0f);
+      result["cell_v_lower_limit"] = std::format("{:.3f}", static_cast<float>(payload[3] << 8 | payload[4]) / 1000.0f);
+      result["temp_upper_limit"] = std::to_string(static_cast<int16_t>(payload[5] << 8 | payload[6]));
+      result["temp_lower_limit"] = std::to_string(static_cast<int16_t>(payload[7] << 8 | payload[8]));
+      result["chg_c_upper_limit"] = std::format("{:.2f}", static_cast<float>(payload[9] << 8 | payload[10]) / 100.0f);
+      result["tot_v_upper_limit"] = std::format("{:.3f}", static_cast<float>(payload[11] << 8 | payload[12]) / 1000.0f);
+      result["tot_v_lower_limit"] = std::format("{:.3f}", static_cast<float>(payload[13] << 8 | payload[14]) / 1000.0f);
+      result["number_of_cells"] = std::to_string(payload[15] << 8 | payload[16]);
+      result["chg_c_limit"] = std::format("{:.2f}", static_cast<float>(payload[17] << 8 | payload[18]) / 100.0f);
+      result["design_cap_none"] = std::format("{:.2f}", static_cast<float>(payload[19] << 8 | payload[20]) / 100.0f);
+      result["history_storage_interval"] = std::to_string(payload[21] << 8 | payload[22]);
+      result["balanced_mode"] = std::to_string(payload[23] << 8 | payload[24]);
+      result["product_barcode"] = std::string(payload.begin() + 25, payload.begin() + 45);
+      result["bms_barcode"] = std::string(payload.begin() + 45, payload.begin() + 65);
+      return result;
+    }
+
+    std::unordered_map<std::string, std::string> unpack_mfg_params(std::vector<uint8_t> payload) {
+      std::unordered_map<std::string, std::string> result;
+      result["pack_sn"] = std::string(payload.begin() + 6, payload.begin() + 36);
+      result["product_id"] = std::string(payload.begin() + 36, payload.begin() + 66);
+      result["bms_id"] = std::string(payload.begin() + 66, payload.begin() + 96);
+      result["manufacturer"] = std::string(payload.begin() + 99, payload.begin() + 119);
+      result["born_date"] = std::format("{}-{:02d}-{:02d}", payload[96] + 2000, payload[97], payload[98]);
+      return result;
+    }
+
+    std::unordered_map<std::string, std::string> unpack_cap_params(std::vector<uint8_t> payload) {
+      std::unordered_map<std::string, std::string> result;
+      result["remaining_cap_ah"] = std::format("{:.2f}", static_cast<float>(payload[6] << 8 | payload[7]) / 100.0f);
+      result["full_cap_ah"] = std::format("{:.2f}", static_cast<float>(payload[8] << 8 | payload[9]) / 100.0f);
+      result["design_cap_ah"] = std::format("{:.2f}", static_cast<float>(payload[10] << 8 | payload[11]) / 100.0f);
+      result["total_charge_cap_ah"] = std::format("{:.2f}", static_cast<float>(payload[12] << 8 | payload[13] << 8 | payload[14] << 8 | payload[15]) / 100.0f);
+      result["total_discharge_cap_ah"] = std::format("{:.2f}", static_cast<float>(payload[16] << 8 | payload[17] << 8 | payload[18] << 8 | payload[19]) / 100.0f);
+      result["total_charge_kwh"] = std::format("{:.2f}", static_cast<float>(payload[20] << 8 | payload[21]) / 100.0f);
+      result["total_discharge_kwh"] = std::format("{:.2f}", static_cast<float>(payload[22] << 8 | payload[23]) / 100.0f);
+      return result;
     }
 
 #ifdef TESTING
