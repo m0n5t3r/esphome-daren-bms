@@ -56,7 +56,7 @@ class DarenBMS {
   bool parse_response_(const std::string &response, std::vector<uint8_t> &payload);
 
   // read response
-  std::string read_response();
+  std::string read_response_();
 
   // Setup phase queries
   void query_manufacturer_info_();

@@ -48,7 +48,7 @@ void DarenBMS::loop() {
   if (this->setup_state_ != SETUP_COMPLETE) {
     // Check for responses to setup queries
     std::vector<uint8_t> payload;
-    if (this->parse_response_(this->read_response(), payload)) {
+    if (this->parse_response_(this->read_response_(), payload)) {
       switch (this->setup_state_) {
         case SETUP_MFG_INFO:
           this->manufacturer_info_ = std::string(payload.begin(), payload.end());
@@ -193,7 +193,7 @@ uint16_t DarenBMS::checksum_(const std::string &s) {
   return cksum + 1;
 }
 
-std::string DarenBMS::read_response() {
+std::string DarenBMS::read_response_() {
   std::string buf;
 #ifndef TESTING
   if (this->available() >= 1) {
@@ -247,7 +247,7 @@ bool DarenBMS::parse_response_(const std::string &buf, std::vector<uint8_t> &pay
   }
 
   // Extract payload length
-  uint16_t len_id = response[4] <<8 | response[5];
+  uint16_t len_id = response[5] << 8 | response[6];
   uint16_t length = (len_id & 0x0fff) / 2;
   if (response.size() < 6 + length) {
 #ifndef TESTING
@@ -266,7 +266,7 @@ bool DarenBMS::parse_response_(const std::string &buf, std::vector<uint8_t> &pay
   }
 
   // Extract payload (skip header and checksum)
-  payload.assign(response.begin() + 5, response.begin() + 5 + length - 1);
+  payload.assign(response.begin() + 7, response.begin() + 7 + length);
   return true;
 }
 
