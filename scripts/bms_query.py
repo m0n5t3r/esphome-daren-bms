@@ -269,7 +269,7 @@ class DarenProto:
 class DarenClient:
     def __init__(self, addr: str, port: str) -> None:
         self.proto: DarenProto = DarenProto(bytes.fromhex(addr))
-        self.ser: serial.Serial = serial.Serial(port, 9600)
+        self.ser: serial.Serial = serial.serial_for_url(port, 9600)
 
     @cache
     def get_mfg_params(self) -> Mapping[str, str | int | float]:
