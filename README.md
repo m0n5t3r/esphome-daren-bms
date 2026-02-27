@@ -1,12 +1,21 @@
 # esphome-daren-bms
 
-![GitHub actions](https://github.com/m0n5t3r/esphome-dr-bms/actions/workflows/ci.yaml/badge.svg)
+<!-- ![GitHub actions](https://github.com/m0n5t3r/esphome-dr-bms/actions/workflows/ci.yaml/badge.svg) -->
 
 ESPHome component to monitor a Daren Battery Management System (DR-BMS) via UART-TTL
 
 ## Supported devices
 
-This component supports Daren/DR-BMS devices showing up as DR-JC03 and similar. My device displays DR48100JC-03-V2, but the info gotten via RS485 says NIE-JC48100.
+**WIP, not functional yet**
+Done:
+
+* Python protocol implementation that works and also makes pyright happy.
+* C++ protocol implementation that compiles passes tests on my machine (TM)
+
+TODO:
+* The esphome sensors, configuration, testing on actual hardware (I have the electrical bits figured out - ESP32 hooked via a rs485 transceiver acting as a sernet server, the Python script works fine with it)
+
+This component will support Daren/DR-BMS devices showing up as DR-JC03 and similar. My device displays DR48100JC-03-V2, but the info gotten via RS485 says NIE-JC48100 and manufacturer NIE (the battery brand is Nielftor).
 
 An example protocol implementation in Python is `scripts/bms_query.py`
 
@@ -14,12 +23,11 @@ An example protocol implementation in Python is `scripts/bms_query.py`
 
 * [ESPHome 2024.6.0 or higher](https://github.com/esphome/esphome/releases).
 * Generic ESP32 or ESP8266 board
-* UART connection (RS485 adapter recommended for longer distances)
+* UART connection with RS485 adapter
 
 ## Installation
 
-1. Copy the `daren_bms` directory to your ESPHome `components` directory
-2. Or add as an external component in your ESPHome configuration
+Add as an external component in your ESPHome configuration
 
 ## Configuration
 
@@ -35,6 +43,8 @@ daren_bms:
 ```
 
 ### Full Configuration
+
+(sensor list subject to change)
 
 ```yaml
 uart:
@@ -104,7 +114,3 @@ This component uses the Daren/DR-BMS RS485 protocol specification:
 * https://github.com/syssi/esphome-jk-bms - heavy inspiration for the esphome bits
 * https://github.com/cpttinkering/daren-485 - protocol details
 * https://github.com/butterwecksolutions/DR-JC03-RS485-Switcher - first thing that worked, used for double checking my commands
-
-## License
-
-GNU General Public License v3.0
