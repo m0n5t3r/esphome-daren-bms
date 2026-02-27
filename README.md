@@ -7,10 +7,11 @@ ESPHome component to monitor a Daren Battery Management System (DR-BMS) via UART
 ## Supported devices
 
 **WIP, not functional yet**
+
 Done:
 
 * Python protocol implementation that works and also makes pyright happy.
-* C++ protocol implementation that compiles passes tests on my machine (TM)
+* C++ protocol implementation that compiles, passes tests on my machine (TM)
 
 TODO:
 * The esphome sensors, configuration, testing on actual hardware (I have the electrical bits figured out - ESP32 hooked via a rs485 transceiver acting as a sernet server, the Python script works fine with it)
