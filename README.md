@@ -15,6 +15,7 @@ Done:
 
 TODO:
 * The esphome sensors, configuration, testing on actual hardware (I have the electrical bits figured out - ESP32 hooked via a rs485 transceiver acting as a sernet server, the Python script works fine with it)
+* Optimilization of the C++ bits (after looking at it enough, most if not all things actually have maximum lengths, so the code can be less like ugly Python and more like ugly C)
 
 This component will support Daren/DR-BMS devices showing up as DR-JC03 and similar. My device displays DR48100JC-03-V2, but the info gotten via RS485 says NIE-JC48100 and manufacturer NIE (the battery brand is Nielftor).
 
