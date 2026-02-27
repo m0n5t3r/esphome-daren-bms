@@ -1,5 +1,7 @@
 .aider*
 .*.py[co]
+test
+*.o
 typings/*
 .clangd
 pyproject.toml
