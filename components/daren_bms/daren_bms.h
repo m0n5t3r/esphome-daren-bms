@@ -4,6 +4,8 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #endif // !TESTING
+#include "esphome/components/binary_sensor/binary_sensor.h"
+#include "esphome/components/sensor/sensor.h"
 #include <unordered_map>
 #include <cstdint>
 #include <string>
@@ -28,6 +30,74 @@ namespace esphome {
 
         void set_bms_id(uint8_t bms_id) { this->bms_id_ = bms_id; }
         uint8_t get_bms_id() { return this->bms_id_; }
+
+        // binary sensors
+        void set_balancing_binary_sensor(binary_sensor::BinarySensor *balancing_binary_sensor) {
+          this->balancing_binary_sensor_ = balancing_binary_sensor;
+        }
+        void set_charging_binary_sensor(binary_sensor::BinarySensor *charging_binary_sensor) {
+          this->charging_binary_sensor_ = charging_binary_sensor;
+        }
+        void set_discharging_binary_sensor(binary_sensor::BinarySensor *discharging_binary_sensor) {
+          this->discharging_binary_sensor_ = discharging_binary_sensor;
+        }
+        void set_online_status_binary_sensor(binary_sensor::BinarySensor *online_status_binary_sensor) {
+          this->online_status_binary_sensor_ = online_status_binary_sensor;
+        }
+
+        // sensors
+        void set_delta_cell_voltage_sensor(sensor::Sensor *delta_cell_voltage_sensor) {
+          this->delta_cell_voltage_sensor_ = delta_cell_voltage_sensor;
+        }
+        void set_average_cell_voltage_sensor(sensor::Sensor *average_cell_voltage_sensor) {
+          this->average_cell_voltage_sensor_ = average_cell_voltage_sensor;
+        }
+        void set_cell_count_sensor(sensor::Sensor *cell_count_sensor) {
+          this->cell_count_sensor_ = cell_count_sensor;
+        }
+        void set_mos_temperature_sensor(sensor::Sensor *mos_temperature_sensor) {
+          this->mos_temperature_sensor_ = mos_temperature_sensor;
+        }
+        void set_env_temperature_sensor(sensor::Sensor *env_temperature_sensor) {
+          this->env_temperature_sensor_ = env_temperature_sensor;
+        }
+        void set_pack_temperature_sensor(sensor::Sensor *pack_temperature_sensor) {
+          this->pack_temperature_sensor_ = pack_temperature_sensor;
+        }
+        void set_temperature_sensor_1_sensor(sensor::Sensor *temperature_sensor_1_sensor) {
+          this->temperature_sensor_1_sensor_ = temperature_sensor_1_sensor;
+        }
+        void set_temperature_sensor_2_sensor(sensor::Sensor *temperature_sensor_2_sensor) {
+          this->temperature_sensor_2_sensor_ = temperature_sensor_2_sensor;
+        }
+        void set_temperature_sensor_3_sensor(sensor::Sensor *temperature_sensor_3_sensor) {
+          this->temperature_sensor_3_sensor_ = temperature_sensor_3_sensor;
+        }
+        void set_temperature_sensor_4_sensor(sensor::Sensor *temperature_sensor_4_sensor) {
+          this->temperature_sensor_4_sensor_ = temperature_sensor_4_sensor;
+        }
+        void set_total_voltage_sensor(sensor::Sensor *total_voltage_sensor) {
+          this->total_voltage_sensor_ = total_voltage_sensor;
+        }
+        void set_current_sensor(sensor::Sensor *current_sensor) {
+          this->current_sensor_ = current_sensor;
+        }
+        void set_capacity_remaining_sensor(sensor::Sensor *capacity_remaining_sensor) {
+          this->capacity_remaining_sensor_ = capacity_remaining_sensor;
+        }
+        void set_temperature_sensors_sensor(sensor::Sensor *temperature_sensors_sensor) {
+          this->temperature_sensors_sensor_ = temperature_sensors_sensor;
+        }
+        void set_charging_cycles_sensor(sensor::Sensor *charging_cycles_sensor) {
+          this->charging_cycles_sensor_ = charging_cycles_sensor;
+        }
+
+        // cell sensors
+        void set_cell_voltage_sensor(uint8_t cell, sensor::Sensor *cell_voltage_sensor) {
+          if (cell < 16) {
+            this->cells_[cell].cell_voltage_sensor_ = cell_voltage_sensor;
+          }
+        }
 
       protected:
         uint8_t bms_id_ = 0x01;  // Default BMS ID
@@ -58,6 +128,32 @@ namespace esphome {
         std::string manufacturer_params_;
         std::string capacity_params_;
         std::string system_params_;
+
+        // sensors
+        binary_sensor::BinarySensor *balancing_binary_sensor_;
+        binary_sensor::BinarySensor *charging_binary_sensor_;
+        binary_sensor::BinarySensor *discharging_binary_sensor_;
+        binary_sensor::BinarySensor *online_status_binary_sensor_;
+
+        sensor::Sensor *delta_cell_voltage_sensor_;
+        sensor::Sensor *average_cell_voltage_sensor_;
+        sensor::Sensor *cell_count_sensor_;
+        sensor::Sensor *mos_temperature_sensor_;
+        sensor::Sensor *env_temperature_sensor_;
+        sensor::Sensor *pack_temperature_sensor_;
+        sensor::Sensor *temperature_sensor_1_sensor_;
+        sensor::Sensor *temperature_sensor_2_sensor_;
+        sensor::Sensor *temperature_sensor_3_sensor_;
+        sensor::Sensor *temperature_sensor_4_sensor_;
+        sensor::Sensor *total_voltage_sensor_;
+        sensor::Sensor *current_sensor_;
+        sensor::Sensor *capacity_remaining_sensor_;
+        sensor::Sensor *temperature_sensors_sensor_;
+        sensor::Sensor *charging_cycles_sensor_;
+
+        struct Cell {
+          sensor::Sensor *cell_voltage_sensor_{nullptr};
+        } cells_[16];
     };
   }  // namespace daren_bms
 }  // namespace esphome
