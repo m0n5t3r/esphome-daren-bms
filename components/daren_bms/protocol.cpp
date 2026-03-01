@@ -4,8 +4,6 @@
 #include <format>
 #include <unordered_map>
 #include <string>
-#include <array>
-#include <iostream>
 
 #ifndef TESTING
 #include "esphome/core/log.h"
@@ -29,20 +27,16 @@ namespace esphome {
       str += hex[3];
     }
 
-    std::array<uint8_t,BUF_MAX_SIZE> parse_hex(std::string str) {
-      std::array<uint8_t,BUF_MAX_SIZE> parsed = {};
+    StaticVector<uint8_t,BUF_MAX_SIZE> parse_hex(std::string str) {
+      StaticVector<uint8_t,BUF_MAX_SIZE> parsed = {};
       uint buf;
       size_t start = 0;
       size_t end = str.length();
-      size_t pos = 0;
-
       if(str.length() % 2 != 0) {
         return parsed;
       }
-
       if(str[0] == '~') {
-        parsed[pos] = '~';
-        pos++;
+        parsed.push_back('~');
         start = 1;
       }
       if(str[end - 1] == '\r') {
@@ -50,20 +44,16 @@ namespace esphome {
       }
       for (size_t i = start; i < end; i += 2) {
         sscanf(str.substr(i, 2).c_str(), "%02X", &buf);
-        parsed[pos] = buf;
-        pos++;
-        if(pos > BUF_MAX_SIZE - 1) {
-          break;
-        }
+        parsed.push_back(buf);
       }
       if(end != str.length()) {
-        parsed[pos] = '\r';
+        parsed.push_back('\r');
       }
       return parsed;
     }
 
-    bool validate_response(uint8_t bms_id, std::string buf, std::array<uint8_t,BUF_MAX_SIZE> &payload) {
-      std::array<uint8_t,BUF_MAX_SIZE>response = parse_hex(buf);
+    bool validate_response(uint8_t bms_id, std::string buf, StaticVector<uint8_t,BUF_MAX_SIZE> &payload) {
+      StaticVector<uint8_t,BUF_MAX_SIZE>response = parse_hex(buf);
 
       if (response.size() < 6) {
         return false;  // Minimum response size
@@ -98,20 +88,16 @@ namespace esphome {
       }
 
       // Extract payload length
-      uint16_t len_info = response[5] << 8 | response[6];
-      uint16_t length = len_info & 0x0fff;
-
-      if(len_info != length_checksum(length)) {
+      uint16_t len_id = response[5] << 8 | response[6];
+      uint16_t length = (len_id & 0x0fff) / 2;
+      if (response.size() < 6 + length) {
 #ifndef TESTING
         ESP_LOGD(TAG, "Length error: found %d, should be > %d", response.size(), length);
 #endif // !TESTING
         return false;
       }
-      
-      // we're dealing with decoded bytes now
-      length = length / 2;
 
-      uint16_t buf_checksum = response[length + 7] << 8 | response[length + 8];
+      uint16_t buf_checksum = response[response.size() - 3] << 8 | response[response.size() - 2];
       uint16_t calc_checksum = checksum(buf.substr(1, buf.length() - 6));
       if(buf_checksum != calc_checksum) {
 #ifndef TESTING
@@ -121,16 +107,13 @@ namespace esphome {
       }
 
       // Extract payload (skip header and checksum)
-      size_t pos = 0;
-      for(size_t i = 7; i < 7 + length; i++) {
-        payload[pos] = response[i];
-        pos++;
-      }
+      payload.assign(response.begin() + 7, response.begin() + 7 + length);
       return true;
     }
 
-    std::string build_command(uint8_t bms_id, uint8_t cid2, const std::array<uint8_t,BUF_MAX_SIZE> info, uint8_t len) {
+    std::string build_command(uint8_t bms_id, uint8_t cid2, const StaticVector<uint8_t,BUF_MAX_SIZE> info) {
       std::string cmd;
+      size_t len = info.size();
 
       cmd += '~';
       append_hex(cmd, VER);
@@ -164,12 +147,12 @@ namespace esphome {
     std::string build_command(uint8_t bms_id, uint8_t cid2, uint8_t module_id) {
       switch(cid2) {
         case CMD_PARAMS:
-          return build_command(bms_id, cid2, std::array<uint8_t,BUF_MAX_SIZE>{bms_id, 0x01, module_id, 0xff, 0x00}, 5);
+          return build_command(bms_id, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{bms_id, 0x01, module_id, 0xff, 0x00});
         case CMD_MFG_INFO:
         case CMD_PROTOCOL_VERSION:
-          return build_command(bms_id, cid2, std::array<uint8_t,BUF_MAX_SIZE>{}, 0);
+          return build_command(bms_id, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{});
         default:
-          return build_command(bms_id, cid2, std::array<uint8_t,BUF_MAX_SIZE>{bms_id}, 1);
+          return build_command(bms_id, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{bms_id});
       }
     }
 
@@ -192,7 +175,7 @@ namespace esphome {
       return cksum + 1;
     }
 
-    std::unordered_map<std::string, std::string> unpack_mfg_info(std::array<uint8_t,BUF_MAX_SIZE> payload) {
+    std::unordered_map<std::string, std::string> unpack_mfg_info(StaticVector<uint8_t,BUF_MAX_SIZE> payload) {
       std::unordered_map<std::string, std::string> result;
       result["hwtype"] = std::string(payload.begin(), payload.begin() + 10);
       result["product_code"] = std::string(payload.begin() + 10, payload.begin() + 20);
@@ -201,7 +184,7 @@ namespace esphome {
       return result;
     }
 
-    std::unordered_map<std::string, std::string> unpack_device_info(std::array<uint8_t,BUF_MAX_SIZE> payload) {
+    std::unordered_map<std::string, std::string> unpack_device_info(StaticVector<uint8_t,BUF_MAX_SIZE> payload) {
       std::unordered_map<std::string, std::string> result;
       uint8_t cell_count = payload[5];
       result["soc"] = std::format("{:.2f}", static_cast<float>(payload[1] << 8 | payload[2]) / 100.0f);
@@ -253,7 +236,7 @@ namespace esphome {
       return result;
     }
 
-    std::unordered_map<std::string, std::string> unpack_system_params(std::array<uint8_t,BUF_MAX_SIZE> payload) {
+    std::unordered_map<std::string, std::string> unpack_system_params(StaticVector<uint8_t,BUF_MAX_SIZE> payload) {
       std::unordered_map<std::string, std::string> result;
       result["cell_v_upper_limit"] = std::format("{:.3f}", static_cast<float>(payload[1] << 8 | payload[2]) / 1000.0f);
       result["cell_v_lower_limit"] = std::format("{:.3f}", static_cast<float>(payload[3] << 8 | payload[4]) / 1000.0f);
@@ -272,7 +255,7 @@ namespace esphome {
       return result;
     }
 
-    std::unordered_map<std::string, std::string> unpack_mfg_params(std::array<uint8_t,BUF_MAX_SIZE> payload) {
+    std::unordered_map<std::string, std::string> unpack_mfg_params(StaticVector<uint8_t,BUF_MAX_SIZE> payload) {
       std::unordered_map<std::string, std::string> result;
       result["pack_sn"] = std::string(payload.begin() + 6, payload.begin() + 36);
       result["product_id"] = std::string(payload.begin() + 36, payload.begin() + 66);
@@ -282,7 +265,7 @@ namespace esphome {
       return result;
     }
 
-    std::unordered_map<std::string, std::string> unpack_cap_params(std::array<uint8_t,BUF_MAX_SIZE> payload) {
+    std::unordered_map<std::string, std::string> unpack_cap_params(StaticVector<uint8_t,BUF_MAX_SIZE> payload) {
       std::unordered_map<std::string, std::string> result;
       result["remaining_cap_ah"] = std::format("{:.2f}", static_cast<float>(payload[6] << 8 | payload[7]) / 100.0f);
       result["full_cap_ah"] = std::format("{:.2f}", static_cast<float>(payload[8] << 8 | payload[9]) / 100.0f);
@@ -295,7 +278,7 @@ namespace esphome {
     }
 
 #ifdef TESTING
-    char* format_hex(std::array<uint8_t,BUF_MAX_SIZE> data) {
+    char* format_hex(StaticVector<uint8_t,BUF_MAX_SIZE> data) {
       char* hexString = new char[data.size() * 2 + 1];
 
       for (size_t i = 0; i < data.size(); ++i) {

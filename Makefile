@@ -1,6 +1,6 @@
 # Makefile
 CXX = g++
-CXXFLAGS = -Icomponents/daren_bms -DTESTING=1 -std=c++20
+CXXFLAGS = -Icomponents/daren_bms -isystem../esphome -DTESTING=1 -std=c++20
 
 # Compile daren_bms.cpp separately
 daren_bms.o: components/daren_bms/daren_bms.cpp
