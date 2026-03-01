@@ -9,6 +9,8 @@ AUTO_LOAD = ["sensor"]
 daren_bms_ns = cg.esphome_ns.namespace("daren_bms")
 DarenBMS = daren_bms_ns.class_("DarenBMS", cg.Component, uart.UARTDevice)
 
+cg.add_define("BUF_MAX_SIZE", 130)
+
 CONFIG_SCHEMA = (
     cv.Schema({
         cv.GenerateID(): cv.declare_id(DarenBMS),

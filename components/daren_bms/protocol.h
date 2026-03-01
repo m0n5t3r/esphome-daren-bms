@@ -4,6 +4,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#ifndef BUF_MAX_SIZE
+#define BUF_MAX_SIZE 130
+#endif // !BUF_MAX_SIZE
+
 
 namespace esphome {
   namespace daren_bms {
@@ -33,12 +37,12 @@ namespace esphome {
     static const uint8_t CMD_PARAMS_MOD_CAP = 0x04;
 
     // parse hex string into byte array
-    std::vector<uint8_t> parse_hex(std::string str);
+    std::array<uint8_t, BUF_MAX_SIZE> parse_hex(std::string str);
     // assemble command
-    std::string build_command(uint8_t bms_id, uint8_t cid2, const std::vector<uint8_t> info);
+    std::string build_command(uint8_t bms_id, uint8_t cid2, const std::array<uint8_t,BUF_MAX_SIZE> info);
     std::string build_command(uint8_t bms_id, uint8_t cid2, const uint8_t module_id=0);
     // validate response and extract payload
-    bool validate_response(uint8_t bms_id, std::string buf, std::vector<uint8_t> &payload);
+    bool validate_response(uint8_t bms_id, std::string buf, std::array<uint8_t,BUF_MAX_SIZE> &payload);
 
     // Helper methods
     uint16_t length_checksum(uint16_t value);
@@ -46,14 +50,14 @@ namespace esphome {
     void append_hex(std::string &str, uint8_t value);
     void append_hex(std::string &str, uint16_t value);
 
-    std::unordered_map<std::string, std::string> unpack_mfg_info(std::vector<uint8_t> payload);
-    std::unordered_map<std::string, std::string> unpack_device_info(std::vector<uint8_t> payload);
-    std::unordered_map<std::string, std::string> unpack_system_params(std::vector<uint8_t> payload);
-    std::unordered_map<std::string, std::string> unpack_mfg_params(std::vector<uint8_t> payload);
-    std::unordered_map<std::string, std::string> unpack_cap_params(std::vector<uint8_t> payload);
+    std::unordered_map<std::string, std::string> unpack_mfg_info(std::array<uint8_t,BUF_MAX_SIZE> payload);
+    std::unordered_map<std::string, std::string> unpack_device_info(std::array<uint8_t,BUF_MAX_SIZE> payload);
+    std::unordered_map<std::string, std::string> unpack_system_params(std::array<uint8_t,BUF_MAX_SIZE> payload);
+    std::unordered_map<std::string, std::string> unpack_mfg_params(std::array<uint8_t,BUF_MAX_SIZE> payload);
+    std::unordered_map<std::string, std::string> unpack_cap_params(std::array<uint8_t,BUF_MAX_SIZE> payload);
 
 #ifdef TESTING
-    char* format_hex(std::vector<uint8_t> data);
+    char* format_hex(std::array<uint8_t,BUF_MAX_SIZE> data);
 #endif
   }
 }

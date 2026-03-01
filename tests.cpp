@@ -1,4 +1,3 @@
-#include <iterator>
 #define TESTING 1
 
 #include "components/daren_bms/daren_bms.h"
@@ -11,7 +10,6 @@
 #include <format>
 #include <unordered_map>
 #include <cstdio>
-#include <vector>
 
 enum checks {
   MFG_INFO,
@@ -106,7 +104,7 @@ void check_cap_params(){
 }
 
 void check_decode_mfg_info() {
-  std::vector<uint8_t> payload;
+  std::array<uint8_t,BUF_MAX_SIZE> payload;
   std::cout << "\nMFG INFO\n" << std::endl;
   if(esphome::daren_bms::validate_response(bms_id, payloads[checks::MFG_INFO], payload)) {
     std::unordered_map<std::string, std::string>result = esphome::daren_bms::unpack_mfg_info(payload);
@@ -117,7 +115,7 @@ void check_decode_mfg_info() {
 }
 
 void check_decode_device_info() {
-  std::vector<uint8_t> payload;
+  std::array<uint8_t,BUF_MAX_SIZE> payload;
   std::cout << "\nDEVICE INFO\n" << std::endl;
   if(esphome::daren_bms::validate_response(bms_id, payloads[checks::DEVICE_INFO], payload)) {
     std::unordered_map<std::string, std::string>result = esphome::daren_bms::unpack_device_info(payload);
@@ -128,7 +126,7 @@ void check_decode_device_info() {
 }
 
 void check_decode_system_params() {
-  std::vector<uint8_t> payload;
+  std::array<uint8_t,BUF_MAX_SIZE> payload;
   std::cout << "\nSYSTEM PARAMS\n" << std::endl;
   if(esphome::daren_bms::validate_response(bms_id, payloads[checks::SYSTEM_PARAMS], payload)) {
     std::unordered_map<std::string, std::string>result = esphome::daren_bms::unpack_system_params(payload);
@@ -139,7 +137,7 @@ void check_decode_system_params() {
 }
 
 void check_decode_mfg_params() {
-  std::vector<uint8_t> payload;
+  std::array<uint8_t,BUF_MAX_SIZE> payload;
   std::cout << "\nMFG PARAMS\n" << std::endl;
   if(esphome::daren_bms::validate_response(bms_id, payloads[checks::MFG_PARAMS], payload)) {
     std::unordered_map<std::string, std::string>result = esphome::daren_bms::unpack_mfg_params(payload);
@@ -150,7 +148,7 @@ void check_decode_mfg_params() {
 }
 
 void check_decode_cap_params() {
-  std::vector<uint8_t> payload;
+  std::array<uint8_t,BUF_MAX_SIZE> payload;
   std::cout << "\nCAP PARAMS\n" << std::endl;
   if(esphome::daren_bms::validate_response(bms_id, payloads[checks::CAP_PARAMS], payload)) {
     std::unordered_map<std::string, std::string>result = esphome::daren_bms::unpack_cap_params(payload);
