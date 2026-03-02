@@ -268,7 +268,7 @@ namespace esphome {
       MfgParams result;
       result.pack_sn = std::string(payload.begin() + 6, payload.begin() + 36);
       result.product_id = std::string(payload.begin() + 36, payload.begin() + 66);
-      result.device_address = std::string(payload.begin() + 66, payload.begin() + 96);
+      result.bms_id = std::string(payload.begin() + 66, payload.begin() + 96);
       result.manufacturer = std::string(payload.begin() + 99, payload.begin() + 119);
       result.born_date = std::format("{}-{:02d}-{:02d}", payload[96] + 2000, payload[97], payload[98]);
       return result;
