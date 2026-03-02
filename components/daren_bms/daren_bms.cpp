@@ -88,7 +88,7 @@ namespace esphome {
 
       // Normal operation - query device info periodically
       static uint32_t last_update = 0;
-      if (now - last_update > 60000) {  // 60 seconds
+      if (now - last_update > this->update_interval_) {
         last_update = now;
         this->query_device_info_();
       }

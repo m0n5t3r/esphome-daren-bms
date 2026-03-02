@@ -20,7 +20,7 @@ namespace esphome {
         void loop() override;
 
         void set_device_address(uint8_t device_address) { this->device_address_ = device_address; }
-        uint8_t get_device_address() { return this->device_address_; }
+        void set_update_interval(uint interval) { this->update_interval_ = interval; }
 
         // binary sensors
         void set_balancing_binary_sensor(binary_sensor::BinarySensor *balancing_binary_sensor) {
@@ -92,6 +92,7 @@ namespace esphome {
 
       protected:
         uint8_t device_address_{0x01};  // Default BMS ID
+        uint update_interval_{30000}; // Default update interval in ms
 
         // read response
         void read_response_();
