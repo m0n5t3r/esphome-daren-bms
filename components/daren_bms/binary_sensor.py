@@ -46,7 +46,7 @@ CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
 
 
 async def to_code(config):
-    hub = await cg.get_variable(config[CONF_DAREN_BMS_ID])
+    hub = await cg.get_variable(config[CONF_ID])
     for key in BINARY_SENSORS:
         if key in config:
             conf = config[key]
