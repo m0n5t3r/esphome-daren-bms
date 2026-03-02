@@ -20,7 +20,7 @@ from esphome.const import (
     UNIT_VOLT,
 )
 
-from . import CONF_DAREN_BMS_ID, DAREN_BMS_COMPONENT_SCHEMA
+from . import CONF_DAREN_BMS_ID, DarenBMS
 
 DEPENDENCIES = ["daren_bms"]
 
@@ -117,8 +117,9 @@ SENSORS = [
 ]
 
 # pylint: disable=too-many-function-args
-CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
+CONFIG_SCHEMA = cv.Schema(
     {
+        cv.GenerateID(CONF_DAREN_BMS_ID): cv.use_id(DarenBMS),
         cv.Optional(CONF_DELTA_CELL_VOLTAGE): sensor.sensor_schema(
             unit_of_measurement=UNIT_VOLT,
             icon=ICON_EMPTY,
