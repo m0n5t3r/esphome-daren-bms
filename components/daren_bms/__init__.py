@@ -11,6 +11,7 @@ daren_bms_ns = cg.esphome_ns.namespace("daren_bms")
 DarenBMS = daren_bms_ns.class_("DarenBMS", cg.Component, uart.UARTDevice)
 
 CONF_DAREN_BMS_ID = "daren_bms_id"
+CONF_DEVICE_ADDRESS = "bms_device_address"
 DAREN_BMS_COMPONENT_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(DarenBMS),
@@ -25,7 +26,9 @@ CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    cg.add_define("BUF_MAX_SIZE", 130)
-    cg.add(var.set_bms_id(config[CONF_ADDRESS]))
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
+    cg.add_define("BUF_MAX_SIZE", 130)
+    if device_addr := config.get(CONF_DEVICE_ADDRESS):
+        cg.add(var.set_bms_id(device_addr))
+    cg.add(var.set_bms_id(config[CONF_DEVICE_ADDRESS]))
