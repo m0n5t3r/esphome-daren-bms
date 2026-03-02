@@ -52,12 +52,16 @@ namespace esphome {
       LOG_SENSOR("", "Capacity Remaining", this->capacity_remaining_sensor_);
       LOG_SENSOR("", "Temperature Sensors", this->temperature_sensors_sensor_);
       LOG_SENSOR("", "Charging Cycles", this->charging_cycles_sensor_);
-    }
+}
 
     void DarenBMS::loop() {
       const uint32_t now = millis();
 
       this->read_response_();
+      if(this->setup_state_ == COMMAND_SENT) {
+        return;
+      }
+
       // Handle setup phase
       if (this->setup_state_ != SETUP_COMPLETE) {
         // Check for responses to setup queries
@@ -66,12 +70,14 @@ namespace esphome {
           //  ESP_LOGD(TAG, "Querying manufacturer info");
           //  this->query_manufacturer_info_();
           //case SETUP_MFG_INFO:
-            ESP_LOGD(TAG, "Querying manufacturer params");
+          //  ESP_LOGD(TAG, "Querying manufacturer params");
             this->query_manufacturer_params_();
+            this->setup_state_ = COMMAND_SENT;
             break;
           case SETUP_MFG_PARAMS:
             ESP_LOGD(TAG, "Querying capacity params");
             this->query_capacity_params_();
+            this->setup_state_ = COMMAND_SENT;
             break;
           //case SETUP_CAP_PARAMS:
           //  ESP_LOGD(TAG, "Querying system params");
@@ -87,6 +93,7 @@ namespace esphome {
       if (now - last_update > this->update_interval_) {
         last_update = now;
         this->query_device_info_();
+        this->setup_state_ = COMMAND_SENT;
       }
     }
 

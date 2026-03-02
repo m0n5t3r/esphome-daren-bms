@@ -114,7 +114,8 @@ namespace esphome {
           SETUP_MFG_PARAMS,
           SETUP_CAP_PARAMS,
           SETUP_SYSTEM_PARAMS,
-          SETUP_COMPLETE
+          SETUP_COMPLETE,
+          COMMAND_SENT
         } setup_state_{SETUP_BEGIN};
 
         // Data storage
