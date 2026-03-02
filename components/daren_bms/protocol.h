@@ -39,10 +39,10 @@ namespace esphome {
     // parse hex string into byte array
     StaticVector<uint8_t, BUF_MAX_SIZE> parse_hex(std::string str);
     // assemble command
-    std::string build_command(uint8_t bms_id, uint8_t cid2, const StaticVector<uint8_t,BUF_MAX_SIZE> info);
-    std::string build_command(uint8_t bms_id, uint8_t cid2, const uint8_t module_id=0);
+    std::string build_command(uint8_t device_address, uint8_t cid2, const StaticVector<uint8_t,BUF_MAX_SIZE> info);
+    std::string build_command(uint8_t device_address, uint8_t cid2, const uint8_t module_id=0);
     // validate response and extract payload
-    bool validate_response(uint8_t bms_id, std::string buf, StaticVector<uint8_t,BUF_MAX_SIZE> &payload);
+    bool validate_response(uint8_t device_address, std::string buf, StaticVector<uint8_t,BUF_MAX_SIZE> &payload);
 
     // Helper methods
     uint16_t length_checksum(uint16_t value);

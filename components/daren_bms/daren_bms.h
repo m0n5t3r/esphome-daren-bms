@@ -29,8 +29,8 @@ namespace esphome {
         DarenBMS() = default;
 #endif // !TESTING
 
-        void set_bms_id(uint8_t bms_id) { this->bms_id_ = bms_id; }
-        uint8_t get_bms_id() { return this->bms_id_; }
+        void set_device_address(uint8_t device_address) { this->device_address_ = device_address; }
+        uint8_t get_device_address() { return this->device_address_; }
 
         // binary sensors
         void set_balancing_binary_sensor(binary_sensor::BinarySensor *balancing_binary_sensor) {
@@ -101,7 +101,7 @@ namespace esphome {
         }
 
       protected:
-        uint8_t bms_id_{0x01};  // Default BMS ID
+        uint8_t device_address_{0x01};  // Default BMS ID
 
         // read response
         std::string read_response_();

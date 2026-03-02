@@ -30,5 +30,4 @@ async def to_code(config):
     await uart.register_uart_device(var, config)
     cg.add_define("BUF_MAX_SIZE", 130)
     if device_addr := config.get(CONF_DEVICE_ADDRESS):
-        cg.add(var.set_bms_id(device_addr))
-    cg.add(var.set_bms_id(config[CONF_DEVICE_ADDRESS]))
+        cg.add(var.set_device_address(device_addr))

@@ -22,7 +22,7 @@ namespace esphome {
 
     void DarenBMS::dump_config() {
       ESP_LOGCONFIG(TAG, "Daren BMS:");
-      ESP_LOGCONFIG(TAG, "  BMS ID: 0x%02X", this->bms_id_);
+      ESP_LOGCONFIG(TAG, "  BMS ID: 0x%02X", this->device_address_);
       ESP_LOGCONFIG(TAG, "  Manufacturer Info: %s", this->manufacturer_info_.c_str());
       ESP_LOGCONFIG(TAG, "  Manufacturer Params: %s", this->manufacturer_params_.c_str());
       ESP_LOGCONFIG(TAG, "  Capacity Params: %s", this->capacity_params_.c_str());
@@ -71,7 +71,7 @@ namespace esphome {
       if (this->setup_state_ != SETUP_COMPLETE) {
         // Check for responses to setup queries
         StaticVector<uint8_t,BUF_MAX_SIZE> payload;
-        if (validate_response(this->bms_id_, this->read_response_(), payload)) {
+        if (validate_response(this->device_address_, this->read_response_(), payload)) {
           switch (this->setup_state_) {
             case SETUP_MFG_INFO:
               this->manufacturer_info_ = std::string(payload.begin(), payload.end());
@@ -126,7 +126,7 @@ namespace esphome {
     }
 
     void DarenBMS::query_manufacturer_info_() {
-      std::string cmd = build_command(this->bms_id_, CMD_MFG_INFO);
+      std::string cmd = build_command(this->device_address_, CMD_MFG_INFO);
 #ifndef TESTING
       this->write_str(cmd.c_str());
       ESP_LOGD(TAG, "Querying manufacturer info: %s", cmd.c_str());
@@ -134,7 +134,7 @@ namespace esphome {
     }
 
     void DarenBMS::query_manufacturer_params_() {
-      std::string cmd = build_command(this->bms_id_, CMD_PARAMS, CMD_PARAMS_MOD_MFG);
+      std::string cmd = build_command(this->device_address_, CMD_PARAMS, CMD_PARAMS_MOD_MFG);
 #ifndef TESTING
       this->write_str(cmd.c_str());
       ESP_LOGD(TAG, "Querying manufacturer params: %s", cmd.c_str());
@@ -142,7 +142,7 @@ namespace esphome {
     }
 
     void DarenBMS::query_capacity_params_() {
-      std::string cmd = build_command(this->bms_id_, CMD_PARAMS, CMD_PARAMS_MOD_CAP);
+      std::string cmd = build_command(this->device_address_, CMD_PARAMS, CMD_PARAMS_MOD_CAP);
 #ifndef TESTING
       this->write_str(cmd.c_str());
       ESP_LOGD(TAG, "Querying capacity params: %s", cmd.c_str());
@@ -150,7 +150,7 @@ namespace esphome {
     }
 
     void DarenBMS::query_system_params_() {
-      std::string cmd = build_command(this->bms_id_, CMD_SYSTEM_PARAMS);
+      std::string cmd = build_command(this->device_address_, CMD_SYSTEM_PARAMS);
 #ifndef TESTING
       this->write_str(cmd.c_str());
       ESP_LOGD(TAG, "Querying system params: %s", cmd.c_str());
@@ -158,7 +158,7 @@ namespace esphome {
     }
 
     void DarenBMS::query_device_info_() {
-      std::string cmd = build_command(this->bms_id_, CMD_DEVICE_INFO);
+      std::string cmd = build_command(this->device_address_, CMD_DEVICE_INFO);
 #ifndef TESTING
       this->write_str(cmd.c_str());
       ESP_LOGD(TAG, "Querying device info: %s", cmd.c_str());

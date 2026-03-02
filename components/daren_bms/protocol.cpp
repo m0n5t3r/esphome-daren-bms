@@ -51,7 +51,7 @@ namespace esphome {
       return parsed;
     }
 
-    bool validate_response(uint8_t bms_id, std::string buf, StaticVector<uint8_t,BUF_MAX_SIZE> &payload) {
+    bool validate_response(uint8_t device_address, std::string buf, StaticVector<uint8_t,BUF_MAX_SIZE> &payload) {
       StaticVector<uint8_t,BUF_MAX_SIZE>response = parse_hex(buf);
 
       if (response.size() < 6) {
@@ -69,7 +69,7 @@ namespace esphome {
       }
 
       // Check address
-      if (response[2] != bms_id) {
+      if (response[2] != device_address) {
         return false;
       }
 
@@ -110,13 +110,13 @@ namespace esphome {
       return true;
     }
 
-    std::string build_command(uint8_t bms_id, uint8_t cid2, const StaticVector<uint8_t,BUF_MAX_SIZE> info) {
+    std::string build_command(uint8_t device_address, uint8_t cid2, const StaticVector<uint8_t,BUF_MAX_SIZE> info) {
       std::string cmd;
       size_t len = info.size();
 
       cmd += '~';
       append_hex(cmd, VER);
-      append_hex(cmd, bms_id);
+      append_hex(cmd, device_address);
       append_hex(cmd, CID1);
       append_hex(cmd, cid2);
 
@@ -143,15 +143,15 @@ namespace esphome {
       return cmd;
     }
 
-    std::string build_command(uint8_t bms_id, uint8_t cid2, uint8_t module_id) {
+    std::string build_command(uint8_t device_address, uint8_t cid2, uint8_t module_id) {
       switch(cid2) {
         case CMD_PARAMS:
-          return build_command(bms_id, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{bms_id, 0x01, module_id, 0xff, 0x00});
+          return build_command(device_address, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{device_address, 0x01, module_id, 0xff, 0x00});
         case CMD_MFG_INFO:
         case CMD_PROTOCOL_VERSION:
-          return build_command(bms_id, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{});
+          return build_command(device_address, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{});
         default:
-          return build_command(bms_id, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{bms_id});
+          return build_command(device_address, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{device_address});
       }
     }
 
@@ -268,7 +268,7 @@ namespace esphome {
       MfgParams result;
       result.pack_sn = std::string(payload.begin() + 6, payload.begin() + 36);
       result.product_id = std::string(payload.begin() + 36, payload.begin() + 66);
-      result.bms_id = std::string(payload.begin() + 66, payload.begin() + 96);
+      result.device_address = std::string(payload.begin() + 66, payload.begin() + 96);
       result.manufacturer = std::string(payload.begin() + 99, payload.begin() + 119);
       result.born_date = std::format("{}-{:02d}-{:02d}", payload[96] + 2000, payload[97], payload[98]);
       return result;
