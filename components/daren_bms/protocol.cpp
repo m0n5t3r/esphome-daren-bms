@@ -211,36 +211,36 @@ namespace esphome {
       result.pack_temp = static_cast<float>(static_cast<int16_t>(payload[40] << 8 | payload[41])) / 10.0f;
       result.mos_temp = static_cast<float>(static_cast<int16_t>(payload[42] << 8 | payload[43])) / 10.0f;
 
-      result.tot_temps = payload[43];
+      result.tot_temps = payload[44];
 
-      result.temp_1 = static_cast<float>(static_cast<int16_t>(payload[44] << 8 | payload[45])) / 10.0f;
-      result.temp_2 = static_cast<float>(static_cast<int16_t>(payload[46] << 8 | payload[47])) / 10.0f;
-      result.temp_3 = static_cast<float>(static_cast<int16_t>(payload[48] << 8 | payload[49])) / 10.0f;
-      result.temp_4 = static_cast<float>(static_cast<int16_t>(payload[50] << 8 | payload[51])) / 10.0f;
+      result.temp_1 = static_cast<float>(static_cast<int16_t>(payload[45] << 8 | payload[46])) / 10.0f;
+      result.temp_2 = static_cast<float>(static_cast<int16_t>(payload[47] << 8 | payload[48])) / 10.0f;
+      result.temp_3 = static_cast<float>(static_cast<int16_t>(payload[49] << 8 | payload[50])) / 10.0f;
+      result.temp_4 = static_cast<float>(static_cast<int16_t>(payload[51] << 8 | payload[52])) / 10.0f;
 
-      result.current = static_cast<float>(static_cast<int16_t>(payload[52] << 8 | payload[53])) / 100.0f;
-      result.internal_r = static_cast<float>(payload[54] << 8 | payload[55]) / 10.0f;
-      result.soh = payload[56] << 8 | payload[57];
-      result.user_custom = payload[58];
-      result.charge_full_ah = static_cast<float>(payload[59] << 8 | payload[60]) / 100.0f;
-      result.charge_now_ah = static_cast<float>(payload[61] << 8 | payload[62]) / 100.0f;
-      result.cycle_count = payload[63] << 8 | payload[64];
-      result.voltage_status = payload[65] << 8 | payload[66];
-      result.current_status = payload[67] << 8 | payload[68];
-      result.temp_status = payload[69] << 8 | payload[70];
-      result.fet_status = payload[71] << 8 | payload[72];
-      result.overvolt_prot_status_l = payload[73] << 8 | payload[74];
-      result.undervolt_prot_status_l = payload[75] << 8 | payload[76];
-      result.overvolt_alarm_status_l = payload[77] << 8 | payload[78];
-      result.undervolt_alarm_status_l = payload[79] << 8 | payload[80];
-      result.balance_state_l = payload[81] << 8 | payload[82];
-      result.balance_state_h = payload[83] << 8 | payload[84];
-      result.overvolt_prot_status_h = payload[85] << 8 | payload[86];
-      result.undervolt_prot_status_h = payload[87] << 8 | payload[88];
-      result.overvolt_alarm_status_h = payload[89] << 8 | payload[90];
-      result.undervolt_alarm_status_h = payload[91] << 8 | payload[92];
-      result.machine_status_list = payload[93];
-      result.io_status_list = payload[94] << 8 | payload[95];
+      result.current = static_cast<float>(static_cast<int16_t>(payload[53] << 8 | payload[54])) / 100.0f;
+      result.internal_r = static_cast<float>(payload[55] << 8 | payload[56]) / 10.0f;
+      result.soh = payload[57] << 8 | payload[58];
+      result.user_custom = payload[59];
+      result.charge_full_ah = static_cast<float>(payload[60] << 8 | payload[61]) / 100.0f;
+      result.charge_now_ah = static_cast<float>(payload[62] << 8 | payload[63]) / 100.0f;
+      result.cycle_count = payload[64] << 8 | payload[65];
+      result.voltage_status = payload[66] << 8 | payload[67];
+      result.current_status = payload[68] << 8 | payload[69];
+      result.temp_status = payload[70] << 8 | payload[71];
+      result.fet_status = payload[72] << 8 | payload[73];
+      result.overvolt_prot_status_l = payload[74] << 8 | payload[75];
+      result.undervolt_prot_status_l = payload[76] << 8 | payload[77];
+      result.overvolt_alarm_status_l = payload[78] << 8 | payload[79];
+      result.undervolt_alarm_status_l = payload[80] << 8 | payload[81];
+      result.balance_state_l = payload[82] << 8 | payload[83];
+      result.balance_state_h = payload[84] << 8 | payload[85];
+      result.overvolt_prot_status_h = payload[86] << 8 | payload[87];
+      result.undervolt_prot_status_h = payload[88] << 8 | payload[89];
+      result.overvolt_alarm_status_h = payload[90] << 8 | payload[91];
+      result.undervolt_alarm_status_h = payload[92] << 8 | payload[93];
+      result.machine_status_list = payload[94];
+      result.io_status_list = payload[95] << 8 | payload[96];
 
       return result;
     }
