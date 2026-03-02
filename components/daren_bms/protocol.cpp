@@ -1,6 +1,7 @@
 #include "protocol.h"
 #include <cstdint>
 #include <cstdio>
+#include <esphome/core/helpers.h>
 #include <format>
 #include <string>
 
@@ -109,7 +110,7 @@ namespace esphome {
       }
 
       // Extract payload (skip header and checksum)
-      payload.assign(response.begin() + 7, response.begin() + 7 + length);
+      std::copy(response.begin() + 7, response.begin() + 7 + length, payload.data());
       return true;
     }
 
@@ -147,14 +148,17 @@ namespace esphome {
     }
 
     std::string build_command(uint8_t device_address, uint8_t cid2, uint8_t module_id) {
+      StaticVector<uint8_t, BUF_MAX_SIZE> info = {};
       switch(cid2) {
         case CMD_PARAMS:
-          return build_command(device_address, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{device_address, 0x01, module_id, 0xff, 0x00});
+          info = {device_address, 0x01, module_id, 0xff, 0x00};
+          return build_command(device_address, cid2, info);
         case CMD_MFG_INFO:
         case CMD_PROTOCOL_VERSION:
-          return build_command(device_address, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{});
+          return build_command(device_address, cid2, info);
         default:
-          return build_command(device_address, cid2, StaticVector<uint8_t,BUF_MAX_SIZE>{device_address});
+          info = {device_address};
+          return build_command(device_address, cid2, info);
       }
     }
 
