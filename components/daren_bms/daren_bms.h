@@ -1,6 +1,7 @@
 #pragma once
 
 #include "protocol.h"
+#include <esphome/core/helpers.h>
 #ifndef TESTING
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
@@ -104,7 +105,8 @@ namespace esphome {
         uint8_t device_address_{0x01};  // Default BMS ID
 
         // read response
-        std::string read_response_();
+        void read_response_();
+        void on_response_received_(StaticVector<uint8_t, BUF_MAX_SIZE> &payload);
 
         // Setup phase queries
         void query_manufacturer_info_();
@@ -117,18 +119,19 @@ namespace esphome {
 
         // State tracking
         enum SetupState {
+          SETUP_BEGIN,
           SETUP_MFG_INFO,
           SETUP_MFG_PARAMS,
           SETUP_CAP_PARAMS,
           SETUP_SYSTEM_PARAMS,
           SETUP_COMPLETE
-        } setup_state_{SETUP_MFG_INFO};
+        } setup_state_{SETUP_BEGIN};
 
         // Data storage
-        std::string manufacturer_info_;
-        std::string manufacturer_params_;
-        std::string capacity_params_;
-        std::string system_params_;
+        MfgInfo manufacturer_info_;
+        MfgParams manufacturer_params_;
+        CapParams capacity_params_;
+        SystemParams system_params_;
 
         // sensors
         binary_sensor::BinarySensor *balancing_binary_sensor_;

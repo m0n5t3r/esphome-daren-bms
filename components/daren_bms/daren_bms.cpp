@@ -2,6 +2,7 @@
 #include "protocol.h"
 #include <cstdint>
 #include <cstdio>
+#include <esphome/core/helpers.h>
 
 #ifndef TESTING
 #include "esphome/core/log.h"
@@ -67,37 +68,29 @@ namespace esphome {
     void DarenBMS::loop() {
       const uint32_t now = millis();
 
+      this->read_response_();
       // Handle setup phase
       if (this->setup_state_ != SETUP_COMPLETE) {
         // Check for responses to setup queries
-        StaticVector<uint8_t,BUF_MAX_SIZE> payload;
-        if (validate_response(this->device_address_, this->read_response_(), payload)) {
-          switch (this->setup_state_) {
-            case SETUP_MFG_INFO:
-              this->manufacturer_info_ = std::string(payload.begin(), payload.end());
-              ESP_LOGD(TAG, "Querying manufacturer params");
-              this->query_manufacturer_params_();
-              break;
-            case SETUP_MFG_PARAMS:
-              this->manufacturer_params_ = std::string(payload.begin(), payload.end());
-              ESP_LOGD(TAG, "Querying capacity params");
-              this->query_capacity_params_();
-              break;
-            case SETUP_CAP_PARAMS:
-              this->capacity_params_ = std::string(payload.begin(), payload.end());
-              ESP_LOGD(TAG, "Querying system params");
-              this->query_system_params_();
-              break;
-            case SETUP_SYSTEM_PARAMS:
-              this->system_params_ = std::string(payload.begin(), payload.end());
-              this->setup_state_ = SETUP_COMPLETE;
-              ESP_LOGI(TAG, "Setup complete");
-              break;
-            default:
-              break;
-          }
+        switch (this->setup_state_) {
+          case SETUP_BEGIN:
+          //  ESP_LOGD(TAG, "Querying manufacturer info");
+          //  this->query_manufacturer_info_();
+          //case SETUP_MFG_INFO:
+            ESP_LOGD(TAG, "Querying manufacturer params");
+            this->query_manufacturer_params_();
+            break;
+          case SETUP_MFG_PARAMS:
+            ESP_LOGD(TAG, "Querying capacity params");
+            this->query_capacity_params_();
+            break;
+          //case SETUP_CAP_PARAMS:
+          //  ESP_LOGD(TAG, "Querying system params");
+          //  this->query_system_params_();
+          //  break;
+          default:
+            break;
         }
-        return;
       }
 
       // Normal operation - query device info periodically
@@ -109,7 +102,7 @@ namespace esphome {
     }
 #endif // !TESTING
 
-    std::string DarenBMS::read_response_() {
+    void DarenBMS::read_response_() {
       std::string buf;
 #ifndef TESTING
       if (this->available() >= 1) {
@@ -122,7 +115,37 @@ namespace esphome {
         }
       }
 #endif // !TESTING
-      return buf;
+      StaticVector<uint8_t,BUF_MAX_SIZE> payload;
+      if (validate_response(this->device_address_, buf, payload)) {
+        this->on_response_received_(payload);
+      }
+    }
+
+    void DarenBMS::on_response_received_(StaticVector<uint8_t, BUF_MAX_SIZE> &payload) {
+      // Handle setup phase
+      switch (this->setup_state_) {
+        case SETUP_MFG_INFO:
+          this->manufacturer_info_ = unpack_mfg_info(payload);
+          this->setup_state_ = SETUP_MFG_PARAMS;
+          break;
+        case SETUP_MFG_PARAMS:
+          this->manufacturer_params_ = unpack_mfg_params(payload);
+          this->setup_state_ = SETUP_CAP_PARAMS;
+          break;
+        case SETUP_CAP_PARAMS:
+          this->capacity_params_ = unpack_cap_params(payload);
+          //this->setup_state_ = SETUP_SYSTEM_PARAMS;
+          this->setup_state_ = SETUP_COMPLETE;
+          break;
+        case SETUP_SYSTEM_PARAMS:
+          this->system_params_ = unpack_system_params(payload);
+          this->setup_state_ = SETUP_COMPLETE;
+          break;
+        default:
+          DeviceInfo state = unpack_device_info(payload);
+          this->update_device_info_(state);
+          break;
+      }
     }
 
     void DarenBMS::query_manufacturer_info_() {
@@ -164,6 +187,8 @@ namespace esphome {
       ESP_LOGD(TAG, "Querying device info: %s", cmd.c_str());
 #endif // !TESTING
     }
+
+    
 
     void DarenBMS::update_sensor_(binary_sensor::BinarySensor *binary_sensor, const bool &state) {
       if (binary_sensor == nullptr)
