@@ -84,7 +84,7 @@ namespace esphome {
       // check CID2
       if (response[4] != 0x00) {
 #ifndef TESTING
-        ESP_LOGD(TAG, "CID2 error: %s", CID2_CODES_[response[4]].c_str());
+        ESP_LOGD(TAG, "CID2 error: %s", CID2_CODES[response[4]].c_str());
 #endif // !TESTING
         return false;
       }
