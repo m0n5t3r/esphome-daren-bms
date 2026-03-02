@@ -14,7 +14,7 @@ CONF_DAREN_BMS_ID = "daren_bms_id"
 CONF_DEVICE_ADDRESS = "device_address"
 DAREN_BMS_COMPONENT_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(CONF_ID): cv.use_id(DarenBMS),
+        cv.GenerateID(CONF_ID): cv.declare_id(DarenBMS),
         cv.Optional(CONF_DEVICE_ADDRESS): cv.int_range(0, 255),
     }
 )
