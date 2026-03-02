@@ -355,7 +355,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    hub = await cg.get_variable(config[CONF_ID])
+    hub = await cg.get_variable(config[CONF_DAREN_BMS_ID])
     for i, key in enumerate(CELLS):
         if key in config:
             conf = config[key]
