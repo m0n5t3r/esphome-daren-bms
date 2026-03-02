@@ -179,5 +179,67 @@ namespace esphome {
       sensor->publish_state(state);
     }
 
+    void DarenBMS::update_device_info_(DeviceInfo state){
+      this->update_sensor_(this->balancing_binary_sensor_, state.balance_state_l == 0 && state.balance_state_h == 0);
+      this->update_sensor_(charging_binary_sensor_, state.current > 0);
+      this->update_sensor_(discharging_binary_sensor_, state.current < 0);
+      this->update_sensor_(this->online_status_binary_sensor_, true); // TODO: implement online status
+
+      float voltages[16] = {
+        state.cell_1_voltage,
+        state.cell_2_voltage,
+        state.cell_3_voltage,
+        state.cell_4_voltage,
+        state.cell_5_voltage,
+        state.cell_6_voltage,
+        state.cell_7_voltage,
+        state.cell_8_voltage,
+        state.cell_9_voltage,
+        state.cell_10_voltage,
+        state.cell_11_voltage,
+        state.cell_12_voltage,
+        state.cell_13_voltage,
+        state.cell_14_voltage,
+        state.cell_15_voltage,
+        state.cell_16_voltage,
+      };
+
+      float vmin = voltages[0];
+      float vmax = voltages[0];
+      float vsum = 0;
+
+      for(size_t i=0; i < state.cell_count; i++) {
+        float v = voltages[i];
+        if(vmin > v) {
+          vmin = v;
+        }
+        if(vmax < v) {
+          vmax = v;
+        }
+        vsum += v;
+        this->update_sensor_(this->cells_[i].cell_voltage_sensor_, v);
+      }
+
+      float vdelta = vmax - vmin;
+      float vavg = vsum / state.cell_count;
+      this->update_sensor_(this->delta_cell_voltage_sensor_, vdelta);
+      this->update_sensor_(this->average_cell_voltage_sensor_, vavg);
+      this->update_sensor_(this->cell_count_sensor_, state.cell_count);
+      this->update_sensor_(this->mos_temperature_sensor_, state.mos_temp);
+      this->update_sensor_(this->env_temperature_sensor_, state.env_temp);
+      this->update_sensor_(this->pack_temperature_sensor_, state.pack_temp);
+      this->update_sensor_(this->temperature_sensor_1_sensor_, state.temp_1);
+      this->update_sensor_(this->temperature_sensor_2_sensor_, state.temp_2);
+      this->update_sensor_(this->temperature_sensor_3_sensor_, state.temp_3);
+      this->update_sensor_(this->temperature_sensor_4_sensor_, state.temp_4);
+      this->update_sensor_(this->total_voltage_sensor_, state.voltage);
+      this->update_sensor_(this->current_sensor_, state.current);
+      this->update_sensor_(this->capacity_remaining_sensor_, state.charge_now_ah);
+      this->update_sensor_(this->temperature_sensors_sensor_, state.tot_temps);
+      this->update_sensor_(this->charging_cycles_sensor_, state.cycle_count);
+      this->update_sensor_(this->state_of_charge_sensor_, state.soc);
+      this->update_sensor_(this->state_of_health_sensor_, state.soh);
+    }
+
   }  // namespace daren_bms
 }  // namespace esphome

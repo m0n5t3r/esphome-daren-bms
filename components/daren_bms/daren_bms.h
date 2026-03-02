@@ -1,5 +1,6 @@
 #pragma once
 
+#include "protocol.h"
 #ifndef TESTING
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
@@ -100,7 +101,7 @@ namespace esphome {
         }
 
       protected:
-        uint8_t bms_id_ = 0x01;  // Default BMS ID
+        uint8_t bms_id_{0x01};  // Default BMS ID
 
         // read response
         std::string read_response_();
@@ -150,11 +151,14 @@ namespace esphome {
         sensor::Sensor *capacity_remaining_sensor_;
         sensor::Sensor *temperature_sensors_sensor_;
         sensor::Sensor *charging_cycles_sensor_;
+        sensor::Sensor *state_of_charge_sensor_;
+        sensor::Sensor *state_of_health_sensor_;
 
         struct Cell {
           sensor::Sensor *cell_voltage_sensor_{nullptr};
         } cells_[16];
 
+        void update_device_info_(DeviceInfo state);
 
         void update_sensor_(binary_sensor::BinarySensor *binary_sensor, const bool &state);
         void update_sensor_(sensor::Sensor *sensor, float state);

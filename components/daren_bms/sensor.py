@@ -8,6 +8,7 @@ from esphome.const import (
     DEVICE_CLASS_EMPTY,
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_VOLTAGE,
+    ICON_BATTERY,
     ICON_COUNTER,
     ICON_EMPTY,
     STATE_CLASS_MEASUREMENT,
@@ -53,6 +54,8 @@ CONF_TOTAL_VOLTAGE = "total_voltage"
 CONF_CAPACITY_REMAINING = "capacity_remaining"
 CONF_TEMPERATURE_SENSORS = "temperature_sensors"
 CONF_CHARGING_CYCLES = "charging_cycles"
+CONF_STATE_OF_CHARGE = "state_of_charge"
+CONF_STATE_OF_HEALTH = "state_of_health"
 
 ICON_CURRENT_DC = "mdi:current-dc"
 ICON_MIN_VOLTAGE_CELL = "mdi:battery-minus-outline"
@@ -108,6 +111,8 @@ SENSORS = [
     CONF_CAPACITY_REMAINING,
     CONF_TEMPERATURE_SENSORS,
     CONF_CHARGING_CYCLES,
+    CONF_STATE_OF_CHARGE,
+    CONF_STATE_OF_HEALTH
 ]
 
 # pylint: disable=too-many-function-args
@@ -325,6 +330,20 @@ CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
         cv.Optional(CONF_CHARGING_CYCLES): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
             icon=ICON_CHARGING_CYCLES,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+            state_class=STATE_CLASS_MEASUREMENT,
+        ),
+        cv.Optional(CONF_STATE_OF_CHARGE): sensor.sensor_schema(
+            unit_of_measurement=UNIT_PERCENT,
+            icon=ICON_BATTERY,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+            state_class=STATE_CLASS_MEASUREMENT,
+        ),
+        cv.Optional(CONF_STATE_OF_HEALTH): sensor.sensor_schema(
+            unit_of_measurement=UNIT_PERCENT,
+            icon=ICON_BATTERY,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
