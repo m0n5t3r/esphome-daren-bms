@@ -10,6 +10,9 @@
 
 namespace esphome {
   namespace daren_bms {
+
+    static const char *const TAG = "daren_bms";
+
     void append_hex(std::string &str, uint8_t value) {
       char hex[3];
       sprintf(hex, "%02X", value);
