@@ -3,7 +3,7 @@ from esphome.components import binary_sensor
 import esphome.config_validation as cv
 from esphome.const import CONF_ID, DEVICE_CLASS_CONNECTIVITY, ENTITY_CATEGORY_DIAGNOSTIC
 
-from . import CONF_DAREN_BMS_ID, DAREN_BMS_COMPONENT_SCHEMA
+from . import CONF_DAREN_BMS_ID, DarenBMS
 from .const import CONF_CHARGING, CONF_DISCHARGING
 
 DEPENDENCIES = ["daren_bms"]
@@ -26,8 +26,9 @@ BINARY_SENSORS = [
     CONF_ONLINE_STATUS,
 ]
 
-CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
+CONFIG_SCHEMA = cv.Schema(
     {
+        cv.GenerateID(CONF_DAREN_BMS_ID): cv.use_id(DarenBMS),
         cv.Optional(CONF_CHARGING): binary_sensor.binary_sensor_schema(
             icon=ICON_CHARGING
         ),
@@ -46,8 +47,7 @@ CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
 
 
 async def to_code(config):
-    print(config)
-    hub = await cg.get_variable(config[CONF_ID])
+    hub = await cg.get_variable(config[CONF_DAREN_BMS_ID])
     for key in BINARY_SENSORS:
         if key in config:
             conf = config[key]

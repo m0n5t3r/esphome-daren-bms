@@ -12,16 +12,16 @@ DarenBMS = daren_bms_ns.class_("DarenBMS", cg.Component, uart.UARTDevice)
 
 CONF_DAREN_BMS_ID = "daren_bms_id"
 CONF_DEVICE_ADDRESS = "device_address"
-DAREN_BMS_COMPONENT_SCHEMA = cv.Schema(
-    {
-        cv.GenerateID(): cv.declare_id(DarenBMS),
-        cv.Optional(CONF_DEVICE_ADDRESS): cv.int_range(0, 255),
-    }
+CONFIG_SCHEMA = (
+    cv.Schema(
+        {
+            cv.GenerateID(): cv.declare_id(DarenBMS),
+            cv.Optional(CONF_DEVICE_ADDRESS): cv.int_range(0, 255),
+        }
+    )
+    .extend(cv.polling_component_schema("30s"))
+    .extend(uart.UART_DEVICE_SCHEMA)
 )
-
-CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
-    cv.polling_component_schema("30s")
-).extend(uart.UART_DEVICE_SCHEMA)
 
 
 async def to_code(config):
