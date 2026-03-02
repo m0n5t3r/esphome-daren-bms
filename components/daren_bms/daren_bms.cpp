@@ -17,10 +17,6 @@ namespace esphome {
     void DarenBMS::dump_config() {
       ESP_LOGCONFIG(TAG, "Daren BMS:");
       ESP_LOGCONFIG(TAG, "  BMS ID: 0x%02X", this->device_address_);
-      ESP_LOGCONFIG(TAG, "  Manufacturer Info: %s", this->manufacturer_info_.c_str());
-      ESP_LOGCONFIG(TAG, "  Manufacturer Params: %s", this->manufacturer_params_.c_str());
-      ESP_LOGCONFIG(TAG, "  Capacity Params: %s", this->capacity_params_.c_str());
-      ESP_LOGCONFIG(TAG, "  System Params: %s", this->system_params_.c_str());
       LOG_BINARY_SENSOR("", "Balancing", this->balancing_binary_sensor_);
       LOG_BINARY_SENSOR("", "Charging", this->charging_binary_sensor_);
       LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
