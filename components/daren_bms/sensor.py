@@ -3,11 +3,9 @@ from esphome.components import sensor
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_CURRENT,
-    CONF_POWER,
     DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_EMPTY,
-    DEVICE_CLASS_POWER,
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_VOLTAGE,
     ICON_COUNTER,
@@ -18,7 +16,6 @@ from esphome.const import (
     UNIT_EMPTY,
     UNIT_PERCENT,
     UNIT_VOLT,
-    UNIT_WATT,
 )
 
 from . import CONF_DAREN_BMS_ID, DAREN_BMS_COMPONENT_SCHEMA
