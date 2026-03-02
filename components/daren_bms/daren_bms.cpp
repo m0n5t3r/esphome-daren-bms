@@ -27,6 +27,41 @@ namespace esphome {
       ESP_LOGCONFIG(TAG, "  Manufacturer Params: %s", this->manufacturer_params_.c_str());
       ESP_LOGCONFIG(TAG, "  Capacity Params: %s", this->capacity_params_.c_str());
       ESP_LOGCONFIG(TAG, "  System Params: %s", this->system_params_.c_str());
+      LOG_BINARY_SENSOR("", "Balancing", this->balancing_binary_sensor_);
+      LOG_BINARY_SENSOR("", "Charging", this->charging_binary_sensor_);
+      LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
+      LOG_BINARY_SENSOR("", "Online Status", this->online_status_binary_sensor_);
+      LOG_SENSOR("", "Delta Cell Voltage", this->delta_cell_voltage_sensor_);
+      LOG_SENSOR("", "Average Cell Voltage", this->average_cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Count", this->cell_count_sensor_);
+      LOG_SENSOR("", "Cell Voltage 1", this->cells_[0].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 2", this->cells_[1].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 3", this->cells_[2].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 4", this->cells_[3].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 5", this->cells_[4].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 6", this->cells_[5].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 7", this->cells_[6].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 8", this->cells_[7].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 9", this->cells_[8].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 10", this->cells_[9].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 11", this->cells_[10].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 12", this->cells_[11].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 13", this->cells_[12].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 14", this->cells_[13].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 15", this->cells_[14].cell_voltage_sensor_);
+      LOG_SENSOR("", "Cell Voltage 16", this->cells_[15].cell_voltage_sensor_);
+      LOG_SENSOR("", "MOS Temperature", this->mos_temperature_sensor_);
+      LOG_SENSOR("", "ENV Temperature", this->mos_temperature_sensor_);
+      LOG_SENSOR("", "PACK Temperature", this->mos_temperature_sensor_);
+      LOG_SENSOR("", "Temperature Sensor 1", this->temperature_sensor_1_sensor_);
+      LOG_SENSOR("", "Temperature Sensor 2", this->temperature_sensor_2_sensor_);
+      LOG_SENSOR("", "Temperature Sensor 3", this->temperature_sensor_3_sensor_);
+      LOG_SENSOR("", "Temperature Sensor 4", this->temperature_sensor_4_sensor_);
+      LOG_SENSOR("", "Total Voltage", this->total_voltage_sensor_);
+      LOG_SENSOR("", "Current", this->current_sensor_);
+      LOG_SENSOR("", "Capacity Remaining", this->capacity_remaining_sensor_);
+      LOG_SENSOR("", "Temperature Sensors", this->temperature_sensors_sensor_);
+      LOG_SENSOR("", "Charging Cycles", this->charging_cycles_sensor_);
     }
 
     void DarenBMS::loop() {
@@ -128,6 +163,20 @@ namespace esphome {
       this->write_str(cmd.c_str());
       ESP_LOGD(TAG, "Querying device info: %s", cmd.c_str());
 #endif // !TESTING
+    }
+
+    void DarenBMS::update_sensor_(binary_sensor::BinarySensor *binary_sensor, const bool &state) {
+      if (binary_sensor == nullptr)
+        return;
+
+      binary_sensor->publish_state(state);
+    }
+
+    void DarenBMS::update_sensor_(sensor::Sensor *sensor, float state) {
+      if (sensor == nullptr)
+        return;
+
+      sensor->publish_state(state);
     }
 
   }  // namespace daren_bms

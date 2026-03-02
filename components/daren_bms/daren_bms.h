@@ -154,6 +154,10 @@ namespace esphome {
         struct Cell {
           sensor::Sensor *cell_voltage_sensor_{nullptr};
         } cells_[16];
+
+
+        void update_sensor_(binary_sensor::BinarySensor *binary_sensor, const bool &state);
+        void update_sensor_(sensor::Sensor *sensor, float state);
     };
   }  // namespace daren_bms
 }  // namespace esphome
