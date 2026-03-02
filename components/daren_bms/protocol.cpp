@@ -148,7 +148,7 @@ namespace esphome {
     }
 
     std::string build_command(uint8_t device_address, uint8_t cid2, uint8_t module_id) {
-      StaticVector<uint8_t, BUF_MAX_SIZE> info = {device_address};
+      StaticVector<uint8_t, BUF_MAX_SIZE> info = StaticVector<uint8_t, BUF_MAX_SIZE>{device_address};
       switch(cid2) {
         case CMD_PARAMS:
           info = {{device_address, 0x01, module_id, 0xff, 0x00}};
