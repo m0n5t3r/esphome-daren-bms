@@ -1,8 +1,8 @@
+#include <array>
 #ifndef DR_PROTOCOL_H
 #define DR_PROTOCOL_H 1
 #include <cstdint>
 #include <string>
-#include <unordered_map>
 #include "esphome/core/helpers.h"
 
 #ifndef BUF_MAX_SIZE
@@ -14,7 +14,11 @@ namespace esphome {
 
     static const uint8_t VER = 0x22;
     static const uint8_t CID1 = 0x4A;
-    static const std::unordered_map<uint8_t, std::string> CID2_CODES = {
+    struct DICT_ENTRY {
+      uint8_t key;
+      const char* value;
+    };
+    static const std::array<DICT_ENTRY, 9> CID2_CODES = {{
       {0x00, "CID2 response ok."},
       {0x01, "VER error."},
       {0x02, "CHKSUM error."},
@@ -24,7 +28,7 @@ namespace esphome {
       {0x06, "INFO data invalid."},
       {0x90, "ADR error."},
       {0x91, "Battery communication error."},
-    };
+    }};
 
     static const uint8_t CMD_SYSTEM_PARAMS = 0x47;
     static const uint8_t CMD_PROTOCOL_VERSION = 0x4F;
