@@ -1,14 +1,11 @@
 #pragma once
 
 #include "protocol.h"
-#include <esphome/core/helpers.h>
-#ifndef TESTING
+#include "esphome/core/helpers.h"
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
-#endif // !TESTING
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/components/sensor/sensor.h"
-#include <unordered_map>
 #include <cstdint>
 #include <string>
 #include <cstring>
@@ -16,19 +13,11 @@
 namespace esphome {
   namespace daren_bms {
 
-#ifndef TESTING
     class DarenBMS : public Component, public uart::UARTDevice {
-#else // TESTING
-    class DarenBMS {
-#endif // !TESTING
       public:
-#ifndef TESTING
         void setup() override;
         void dump_config() override;
         void loop() override;
-#else // TESTING
-        DarenBMS() = default;
-#endif // !TESTING
 
         void set_device_address(uint8_t device_address) { this->device_address_ = device_address; }
         uint8_t get_device_address() { return this->device_address_; }
