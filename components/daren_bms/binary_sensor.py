@@ -6,7 +6,7 @@ from esphome.const import CONF_ID, DEVICE_CLASS_CONNECTIVITY, ENTITY_CATEGORY_DI
 from . import CONF_DAREN_BMS_ID, DAREN_BMS_COMPONENT_SCHEMA
 from .const import CONF_CHARGING, CONF_DISCHARGING
 
-#DEPENDENCIES = ["daren_bms"]
+DEPENDENCIES = ["daren_bms"]
 
 CONF_BALANCING = "balancing"
 CONF_ONLINE_STATUS = "online_status"
@@ -46,7 +46,7 @@ CONFIG_SCHEMA = DAREN_BMS_COMPONENT_SCHEMA.extend(
 
 
 async def to_code(config):
-    hub = await cg.get_variable(config[CONF_ID])
+    hub = await cg.get_variable(config[CONF_DAREN_BMS_ID])
     for key in BINARY_SENSORS:
         if key in config:
             conf = config[key]
