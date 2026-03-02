@@ -148,17 +148,20 @@ namespace esphome {
     }
 
     std::string build_command(uint8_t device_address, uint8_t cid2, uint8_t module_id) {
-      StaticVector<uint8_t, BUF_MAX_SIZE> info = StaticVector<uint8_t, BUF_MAX_SIZE>{device_address};
       switch(cid2) {
-        case CMD_PARAMS:
-          info = {{device_address, 0x01, module_id, 0xff, 0x00}};
-          return build_command(device_address, cid2, info);
+        case CMD_PARAMS: {
+            const StaticVector<uint8_t, BUF_MAX_SIZE> param_info = {device_address, 0x01, module_id, 0xff, 0x00};
+            return build_command(device_address, cid2, param_info);
+          }
         case CMD_MFG_INFO:
-        case CMD_PROTOCOL_VERSION:
-          info = {};
-          return build_command(device_address, cid2, info);
-        default:
-          return build_command(device_address, cid2, info);
+        case CMD_PROTOCOL_VERSION: {
+            const StaticVector<uint8_t, BUF_MAX_SIZE> ver_info = {};
+            return build_command(device_address, cid2, ver_info);
+          }
+        default: {
+            const StaticVector<uint8_t, BUF_MAX_SIZE> default_info = {device_address};
+            return build_command(device_address, cid2, default_info);
+          }
       }
     }
 
