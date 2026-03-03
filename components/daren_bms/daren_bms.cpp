@@ -83,6 +83,7 @@ void DarenBMS::read_response_() {
     ESP_LOGD(TAG, "Got response %s", buf.c_str());
     StaticVector<uint8_t, BUF_MAX_SIZE> payload;
     if (validate_response(this->device_address_, buf, payload)) {
+      ESP_LOGD(TAG, "Response is valid");
       this->on_response_received_(payload);
     }
   }
