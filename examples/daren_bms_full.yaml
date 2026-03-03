@@ -119,13 +119,3 @@ sensor:
       name: "Cell 15 Voltage"
     cell_voltage_16:
       name: "Cell 16 Voltage"
-
-# Optional: Add additional sensors or components as needed
-# For example, you might want to add:
-# - A switch to control charging/discharging
-# - Additional temperature sensors
-# - Voltage dividers for more accurate measurements
-# - Current sensors for verification
-
-# Note: Not all sensors may be available on your specific BMS model
-# Check the documentation for your BMS to see which sensors are supported
