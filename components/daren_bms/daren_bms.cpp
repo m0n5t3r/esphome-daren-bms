@@ -114,6 +114,7 @@ void DarenBMS::read_response_() {
 
 void DarenBMS::on_response_received_(StaticVector<uint8_t, BUF_MAX_SIZE> &payload) {
   // Handle setup phase
+  ESP_LOGD(TAG, "Got response");
   switch (this->setup_state_) {
     case SETUP_MFG_INFO:
       this->manufacturer_info_ = unpack_mfg_info(payload);
