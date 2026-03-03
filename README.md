@@ -74,7 +74,7 @@ See [here](examples/daren_bms_full.yaml)
 
 ## Protocol Details
 
-This component uses the Daren/DR-BMS RS485 protocol documented in the saren-485 repo linked below; a stand-alone implementation in Python is `scripts/bms_query.py`.
+This component uses the Daren/DR-BMS RS485 protocol documented in the daren-485 repo linked below; a stand-alone implementation in Python is `scripts/bms_query.py`.
 
 ## References
 
