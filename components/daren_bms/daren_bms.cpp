@@ -15,6 +15,7 @@ void DarenBMS::setup() { ESP_LOGD(TAG, "Setting up Daren BMS..."); }
 void DarenBMS::dump_config() {
   ESP_LOGCONFIG(TAG, "Daren BMS:");
   ESP_LOGCONFIG(TAG, "  BMS ID: 0x%02X", this->device_address_);
+  /*
   LOG_BINARY_SENSOR("", "Balancing", this->balancing_binary_sensor_);
   LOG_BINARY_SENSOR("", "Charging", this->charging_binary_sensor_);
   LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
@@ -50,6 +51,7 @@ void DarenBMS::dump_config() {
   LOG_SENSOR("", "Capacity Remaining", this->capacity_remaining_sensor_);
   LOG_SENSOR("", "Temperature Sensors", this->temperature_sensors_sensor_);
   LOG_SENSOR("", "Charging Cycles", this->charging_cycles_sensor_);
+  */
 }
 
 void DarenBMS::loop() {
