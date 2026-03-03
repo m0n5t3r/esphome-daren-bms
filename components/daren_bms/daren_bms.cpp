@@ -104,14 +104,14 @@ void DarenBMS::read_response_() {
     while (this->read_byte(&data)) {
       buf += data;
       if (data == '\r') {
+        this->comm_state_ = IDLE;
         break;
       }
     }
-  }
-  this->comm_state_ = IDLE;
-  StaticVector<uint8_t, BUF_MAX_SIZE> payload;
-  if (validate_response(this->device_address_, buf, payload)) {
-    this->on_response_received_(payload);
+    StaticVector<uint8_t, BUF_MAX_SIZE> payload;
+    if (validate_response(this->device_address_, buf, payload)) {
+      this->on_response_received_(payload);
+    }
   }
 }
 
