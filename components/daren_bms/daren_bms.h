@@ -98,7 +98,7 @@ class DarenBMS : public Component, public uart::UARTDevice {
 
   // read response
   void read_response_();
-  void on_response_received_(StaticVector<uint8_t, BUF_MAX_SIZE> &payload);
+  void on_response_received_(StaticVector<uint8_t, BUF_MAX_SIZE> payload);
 
   // Setup phase queries
   void query_manufacturer_info_();
