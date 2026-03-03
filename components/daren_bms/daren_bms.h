@@ -116,9 +116,10 @@ class DarenBMS : public Component, public uart::UARTDevice {
     SETUP_MFG_PARAMS,
     SETUP_CAP_PARAMS,
     SETUP_SYSTEM_PARAMS,
-    SETUP_COMPLETE,
-    COMMAND_SENT
+    SETUP_COMPLETE
   } setup_state_{SETUP_BEGIN};
+
+  enum CommState { IDLE, COMMAND_SENT } comm_state_{IDLE};
 
   // Data storage
   MfgInfo manufacturer_info_;
