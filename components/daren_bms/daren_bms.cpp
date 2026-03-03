@@ -114,26 +114,30 @@ void DarenBMS::read_response_() {
 
 void DarenBMS::on_response_received_(StaticVector<uint8_t, BUF_MAX_SIZE> &payload) {
   // Handle setup phase
-  ESP_LOGD(TAG, "Got response");
   switch (this->setup_state_) {
     case SETUP_MFG_INFO:
+      ESP_LOGD(TAG, "Got mfg info");
       this->manufacturer_info_ = unpack_mfg_info(payload);
       this->setup_state_ = SETUP_MFG_PARAMS;
       break;
     case SETUP_MFG_PARAMS:
+      ESP_LOGD(TAG, "Got mfg params");
       this->manufacturer_params_ = unpack_mfg_params(payload);
       this->setup_state_ = SETUP_CAP_PARAMS;
       break;
     case SETUP_CAP_PARAMS:
+      ESP_LOGD(TAG, "Got cap params");
       this->capacity_params_ = unpack_cap_params(payload);
       // this->setup_state_ = SETUP_SYSTEM_PARAMS;
       this->setup_state_ = SETUP_COMPLETE;
       break;
     case SETUP_SYSTEM_PARAMS:
+      ESP_LOGD(TAG, "Got system params");
       this->system_params_ = unpack_system_params(payload);
       this->setup_state_ = SETUP_COMPLETE;
       break;
     default:
+      ESP_LOGD(TAG, "Got device info");
       DeviceInfo state = unpack_device_info(payload);
       this->update_device_info_(state);
       break;
