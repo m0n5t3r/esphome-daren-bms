@@ -52,6 +52,7 @@ void DarenBMS::loop() {
       default:
         break;
     }
+    return;
   }
 
   // Normal operation - query device info periodically
