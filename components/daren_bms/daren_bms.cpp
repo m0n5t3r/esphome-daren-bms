@@ -36,6 +36,7 @@ void DarenBMS::loop() {
         //  ESP_LOGD(TAG, "Querying manufacturer params");
         this->query_manufacturer_params_();
         this->comm_state_ = COMMAND_SENT;
+        this->setup_state_ = SETUP_MFG_PARAMS;
         break;
       case SETUP_MFG_PARAMS:
         ESP_LOGD(TAG, "Querying capacity params");
