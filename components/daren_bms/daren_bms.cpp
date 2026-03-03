@@ -10,7 +10,9 @@ namespace daren_bms {
 
 static const char *const TAG = "daren_bms";
 
-void DarenBMS::setup() { ESP_LOGD(TAG, "Setting up Daren BMS..."); }
+void DarenBMS::setup() {
+  ESP_LOGD(TAG, "Setting up Daren BMS... cmd sent: %d, setup_state_: %d", this->comm_state_, this->setup_state_);
+}
 
 void DarenBMS::dump_config() {
   ESP_LOGCONFIG(TAG, "Daren BMS:");
