@@ -23,7 +23,7 @@ void DarenBMS::loop() {
   static uint32_t last_log = 0;
   if (now - last_log > 1000) {
     last_log = now;
-    ESP_LOGD(TAG, "loop, cmd sent: %d", this->comm_state_);
+    ESP_LOGD(TAG, "loop, cmd sent: %d, setup_state_: %d", this->comm_state_, this->setup_state_);
   }
 
   this->read_response_();
