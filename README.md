@@ -9,8 +9,8 @@ This component implements the protocol documented by  Daren/DR-BMS devices showi
 
 ## Requirements
 
-* [ESPHome 2024.6.0 or higher](https://github.com/esphome/esphome/releases).
-* Generic ESP32 or ESP8266 board
+* [ESPHome 2026.2.2 or higher](https://github.com/esphome/esphome/releases).
+* Generic ESP32 board
 * UART connection with RS485 adapter
 
 ## Installation
