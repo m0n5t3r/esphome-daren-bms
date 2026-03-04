@@ -2,7 +2,6 @@ import esphome.codegen as cg
 from esphome.components import sensor
 import esphome.config_validation as cv
 from esphome.const import (
-    CONF_ID,
     CONF_CURRENT,
     DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_CURRENT,
@@ -317,7 +316,7 @@ CONFIG_SCHEMA = cv.Schema(
             state_class=STATE_CLASS_MEASUREMENT,
         ),
         cv.Optional(CONF_CAPACITY_REMAINING): sensor.sensor_schema(
-            unit_of_measurement=UNIT_PERCENT,
+            unit_of_measurement=UNIT_AMPERE_HOURS,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_BATTERY,
             state_class=STATE_CLASS_MEASUREMENT,
