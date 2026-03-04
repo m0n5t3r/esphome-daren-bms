@@ -318,7 +318,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_CAPACITY_REMAINING): sensor.sensor_schema(
             unit_of_measurement=UNIT_AMPERE_HOURS,
             accuracy_decimals=0,
-            device_class=DEVICE_CLASS_BATTERY,
+            device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
         ),
         cv.Optional(CONF_TEMPERATURE_SENSORS): sensor.sensor_schema(
@@ -339,7 +339,7 @@ CONFIG_SCHEMA = cv.Schema(
             unit_of_measurement=UNIT_PERCENT,
             icon=ICON_BATTERY,
             accuracy_decimals=0,
-            device_class=DEVICE_CLASS_EMPTY,
+            device_class=DEVICE_CLASS_BATTERY,
             state_class=STATE_CLASS_MEASUREMENT,
         ),
         cv.Optional(CONF_STATE_OF_HEALTH): sensor.sensor_schema(
